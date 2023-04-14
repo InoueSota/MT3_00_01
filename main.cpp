@@ -3,7 +3,6 @@
 
 const char kWindowTitle[] = "LD2A_02_イノウエソウタ_";
 const int kRowHeight = 20;
-const int kColumnWidth = 60;
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -21,7 +20,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 v2 = { 4.0f, -1.0f, 2.0f };
 	float k = { 4.0f };
 
-	void VectorScreenPrintf(int x, int y, const Vector3 & vector, const char* label);
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -51,12 +49,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		VectorScreenPrintf(0, 0, resultAdd, "  : Add");
-		VectorScreenPrintf(0, kRowHeight, resultSubtract, "  : Subtract");
-		VectorScreenPrintf(0, kRowHeight * 2, resultMultiply, "  : Multiply");
+		vector3.VectorScreenPrintf(0, 0, resultAdd, "  : Add");
+		vector3.VectorScreenPrintf(0, kRowHeight, resultSubtract, "  : Subtract");
+		vector3.VectorScreenPrintf(0, kRowHeight * 2, resultMultiply, "  : Multiply");
 		Novice::ScreenPrintf(0, kRowHeight * 3, "%.02f  : Dot", resultDot);
 		Novice::ScreenPrintf(0, kRowHeight * 4, "%.02f  : Length", resultLength);
-		VectorScreenPrintf(0, kRowHeight * 5, resultNormalize, "  : Normalize");
+		vector3.VectorScreenPrintf(0, kRowHeight * 5, resultNormalize, "  : Normalize");
 
 		///
 		/// ↑描画処理ここまで
@@ -75,10 +73,3 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Novice::Finalize();
 	return 0;
 }
-
-void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
-	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
-	Novice::ScreenPrintf(x + kColumnWidth, y, "%.02f", vector.y);
-	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
-	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
-};
