@@ -24,6 +24,21 @@ Matrix4x4 Matrix4x4::MakeScaleMatrix(const Vector3& scale) {
 	};
 }
 
+// 3次元アフィン変換行列
+Matrix4x4 Matrix4x4::MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
+
+	// 回転行列を求める
+	Matrix4x4 rotateMatrix = Multiply(MakeRotateXMatrix(rotate.x), Multiply(MakeRotateYMatrix(rotate.y), MakeRotateZMatrix(rotate.z)));
+
+	// 拡縮行列をかける
+	Matrix4x4 scaleRotateMatrix = Multiply(MakeScaleMatrix(scale), rotateMatrix);
+
+	// 平行移動行列をかける
+	Matrix4x4 affineMatrix = Multiply(scaleRotateMatrix, MakeTranslateMatrix(translate));
+
+	return affineMatrix;
+}
+
 //表示
 void Matrix4x4::MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
 	Novice::ScreenPrintf(x, y, "%s", label);
