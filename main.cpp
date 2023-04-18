@@ -2,7 +2,6 @@
 #include "Matrix4x4.h"
 
 const char kWindowTitle[] = "LD2A_02_イノウエソウタ_";
-const int kRowHeight = 20;
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -48,7 +47,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 inverseM2 = matrix4x4.Inverse(m2);
 		Matrix4x4 transposeM1 = matrix4x4.Transpose(m1);
 		Matrix4x4 transposeM2 = matrix4x4.Transpose(m2);
-		Matrix4x4 identity = matrix4x4.MakeIdentify4x4();
+		Matrix4x4 identity = matrix4x4.MakeIdentity4x4();
 
 		///
 		/// ↑更新処理ここまで
