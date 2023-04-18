@@ -1,5 +1,6 @@
 #include <Novice.h>
 #include "Matrix4x4.h"
+#include "Vector3.h"
 
 const char kWindowTitle[] = "LD2A_02_イノウエソウタ_";
 
