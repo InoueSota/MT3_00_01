@@ -15,7 +15,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = {0};
 
 	//インスタンス
-	Vector3 vector3;
 	Matrix4x4 matrix4x4;
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -31,18 +30,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		Vector3 translate{ 4.1f, 2.6f, 0.8f };
-		Vector3 scale{ 1.5f,5.2f,7.3f };
-		Matrix4x4 translateMatrix = matrix4x4.MakeTranslateMatrix(translate);
-		Matrix4x4 scaleMatrix = matrix4x4.MakeScaleMatrix(scale);
-		Vector3 point{ 2.3f,3.8f,1.4f };
-		Matrix4x4 transformMatrix = {
-			1.0f, 2.0f, 3.0f, 4.0f,
-			3.0f, 1.0f, 1.0f, 2.0f,
-			1.0f, 4.0f, 2.0f, 3.0f,
-			2.0f, 2.0f, 1.0f, 3.0f 
-		};
-		Vector3 transformed = vector3.Transform(point, transformMatrix);
+		Vector3 rotate{ 0.4f,1.43f,-0.8f };
+		Matrix4x4 rotateXMatrix = matrix4x4.MakeRotateXMatrix(rotate.x);
+		Matrix4x4 rotateYMatrix = matrix4x4.MakeRotateYMatrix(rotate.y);
+		Matrix4x4 rotateZMatrix = matrix4x4.MakeRotateZMatrix(rotate.z);
+		Matrix4x4 rotateXYZMatrix = matrix4x4.Multiply(rotateXMatrix, matrix4x4.Multiply(rotateYMatrix, rotateZMatrix));
 
 		///
 		/// ↑更新処理ここまで
@@ -52,9 +44,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		vector3.VectorScreenPrintf(0, 0, transformed, "transformed");
-		matrix4x4.MatrixScreenPrintf(0, matrix4x4.kRowHeight, translateMatrix, "translateMatrix");
-		matrix4x4.MatrixScreenPrintf(0, matrix4x4.kRowHeight * 6, scaleMatrix, "scaleMatrix");
+		matrix4x4.MatrixScreenPrintf(0, 0, rotateXMatrix, "rotateXMatrix");
+		matrix4x4.MatrixScreenPrintf(0, matrix4x4.kRowHeight * 5, rotateYMatrix, "rotateYMatrix");
+		matrix4x4.MatrixScreenPrintf(0, matrix4x4.kRowHeight * 5 * 2, rotateZMatrix, "rotateZMatrix");
+		matrix4x4.MatrixScreenPrintf(0, matrix4x4.kRowHeight * 5 * 3, rotateXYZMatrix, "rotateXYZMatrix");
 
 		///
 		/// ↑描画処理ここまで
