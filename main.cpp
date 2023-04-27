@@ -77,7 +77,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		Vector3::VectorScreenPrintf(0, 0, cross, "Cross");
-		Novice::DrawTriangle(int(screenVertices[0].x), int(screenVertices[0].y), int(screenVertices[1].x), int(screenVertices[1].y), int(screenVertices[2].x), int(screenVertices[2].y), RED, kFillModeSolid);
+		Novice::ScreenPrintf(0, 20, "%.1f rotate.y", rotate.y);
+		if (Vector3::Dot({0.0f,0.0f,1.0f}, Vector3::Cross(Vector3::Subtract(screenVertices[1], screenVertices[0]), Vector3::Subtract(screenVertices[2], screenVertices[1]))) <= 0.0f) {
+			Novice::DrawTriangle(int(screenVertices[0].x), int(screenVertices[0].y), int(screenVertices[1].x), int(screenVertices[1].y), int(screenVertices[2].x), int(screenVertices[2].y), RED, kFillModeSolid);
+		}
 
 		///
 		/// ↑描画処理ここまで
