@@ -7,9 +7,9 @@
 class Sphere
 {
 public:
-	Sphere() {
-		center = { 0.0f,0.0f,0.0f };
-		radius = 0.5f;
+	Sphere(const Vector3& center_, float radius_) {
+		center = center_;
+		radius = radius_;
 	}
 
 	/// <summary>
