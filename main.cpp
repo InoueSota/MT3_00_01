@@ -3,6 +3,7 @@
 #include "Matrix4x4.h"
 #include "Vector3.h"
 #include "Sphere.h"
+#include "Line.h"
 #include "Plane.h"
 
 const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_02";
@@ -28,8 +29,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraTranslate{ 0.0f,1.9f,-6.49f };
 	Vector3 cameraRotate{ 0.26f,0.0f,0.0f };
 
-	Sphere sphere({ -0.3f,0.0f,0.0f }, 0.5f);
 	Plane plane{ {0.0f, 1.0f, 0.0f}, 1.0f };
+	Segment segment{ {-0.3f, 0.5f, 0.0f}, {1.0f ,0.5f ,0.0f} };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -75,10 +76,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		// 当たり判定
-		if (Plane::IsCollision(sphere, plane)) {
-			sphere.color = RED;
+		if (Segment::IsCollision(segment, plane)) {
+			segment.color = RED;
 		} else {
-			sphere.color = WHITE;
+			segment.color = WHITE;
 		}
 
 		// 各種行列の計算
@@ -98,14 +99,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		Sphere::DrawGrid(worldViewProjectionMatrix, viewportMatrix);
-		Sphere::DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix);
 		Plane::DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
+		Segment::DrawSegment(segment, worldViewProjectionMatrix, viewportMatrix);
 
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("Sphere.Center", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("Sphere.Radius", &sphere.radius, 0.01f);
 		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
 		plane.normal = Vector3::Normalize(plane.normal);
+		ImGui::DragFloat3("Segment.Origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("Segment.Diff", &segment.diff.x, 0.01f);
 		ImGui::DragFloat3("cameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::End();
