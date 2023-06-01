@@ -1,5 +1,4 @@
 #include "Sphere.h"
-#include <Novice.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -41,7 +40,7 @@ void Sphere::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& vi
 }
 
 // 球描画
-void Sphere::DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+void Sphere::DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
 	const uint32_t kSubdivision = 16;
 	const float kLonEvery = (float)M_PI / ((float)kSubdivision / 2.0f);
 	const float kLatEvery = (float)M_PI / ((float)kSubdivision / 2.0f);
@@ -61,8 +60,21 @@ void Sphere::DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMat
 			Vector3 screenA = Vector3::Transform(ndcA, viewportMatrix);
 			Vector3 screenB = Vector3::Transform(ndcB, viewportMatrix);
 			Vector3 screenC = Vector3::Transform(ndcC, viewportMatrix);
-			Novice::DrawLine((int)screenA.x, (int)screenA.y, (int)screenB.x, (int)screenB.y, color);
-			Novice::DrawLine((int)screenA.x, (int)screenA.y, (int)screenC.x, (int)screenC.y, color);
+			Novice::DrawLine((int)screenA.x, (int)screenA.y, (int)screenB.x, (int)screenB.y, sphere.color);
+			Novice::DrawLine((int)screenA.x, (int)screenA.y, (int)screenC.x, (int)screenC.y, sphere.color);
 		}
 	}
+}
+
+// 球同士当たり判定
+bool Sphere::IsCollision(const Sphere& s1, const Sphere& s2) {
+
+	// 2つの球の中心点間の距離を求める
+	float distance = Vector3::Length(s2.center - s1.center);
+
+	// 半径の合計よりも短ければ衝突
+	if (distance <= s1.radius + s2.radius) {
+		return true;
+	}
+	return false;
 }
