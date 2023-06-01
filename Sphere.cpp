@@ -13,10 +13,8 @@ void Sphere::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& vi
 	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
 		Vector3 worldStartPosition = { -kGridEvery * kSubdivision / 2.0f, 0.0f, kGridEvery * (xIndex - kSubdivision / 2.0f) };
 		Vector3 worldEndPosition = { kGridEvery * kSubdivision / 2.0f, 0.0f, kGridEvery * (xIndex - kSubdivision / 2.0f) };
-		Vector3 ndcStartPosition = Vector3::Transform(worldStartPosition, viewProjectionMatrix);
-		Vector3 ndcEndPosition = Vector3::Transform(worldEndPosition, viewProjectionMatrix);
-		Vector3 screenStartPosition = Vector3::Transform(ndcStartPosition, viewportMatrix);
-		Vector3 screenEndPosition = Vector3::Transform(ndcEndPosition, viewportMatrix);
+		Vector3 screenStartPosition = Vector3::Transform(Vector3::Transform(worldStartPosition, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenEndPosition = Vector3::Transform(Vector3::Transform(worldEndPosition, viewProjectionMatrix), viewportMatrix);
 		if (xIndex == kSubdivision / 2) {
 			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, BLACK);
 		} else {
@@ -27,10 +25,8 @@ void Sphere::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& vi
 	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
 		Vector3 worldStartPosition = { kGridEvery * (zIndex - kSubdivision / 2.0f), 0.0f, -kGridEvery * kSubdivision / 2.0f };
 		Vector3 worldEndPosition = { kGridEvery * (zIndex - kSubdivision / 2.0f), 0.0f, kGridEvery * kSubdivision / 2.0f };
-		Vector3 ndcStartPosition = Vector3::Transform(worldStartPosition, viewProjectionMatrix);
-		Vector3 ndcEndPosition = Vector3::Transform(worldEndPosition, viewProjectionMatrix);
-		Vector3 screenStartPosition = Vector3::Transform(ndcStartPosition, viewportMatrix);
-		Vector3 screenEndPosition = Vector3::Transform(ndcEndPosition, viewportMatrix);
+		Vector3 screenStartPosition = Vector3::Transform(Vector3::Transform(worldStartPosition, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenEndPosition = Vector3::Transform(Vector3::Transform(worldEndPosition, viewProjectionMatrix), viewportMatrix);
 		if (zIndex == kSubdivision / 2) {
 			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, BLACK);
 		} else {
@@ -54,12 +50,9 @@ void Sphere::DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMat
 			a = Vector3::Add(sphere.center, Vector3::Multiply(sphere.radius, { cosf(lat) * cosf(lon), sinf(lat), cosf(lat) * sinf(lon) }));
 			b = Vector3::Add(sphere.center, Vector3::Multiply(sphere.radius, { cosf(lat + kLatEvery) * cosf(lon), sinf(lat + kLatEvery), cosf(lat + kLatEvery) * sinf(lon) }));
 			c = Vector3::Add(sphere.center, Vector3::Multiply(sphere.radius, { cosf(lat) * cosf(lon + kLonEvery), sinf(lat), cosf(lat) * sinf(lon + kLonEvery) }));
-			Vector3 ndcA = Vector3::Transform(a, viewProjectionMatrix);
-			Vector3 ndcB = Vector3::Transform(b, viewProjectionMatrix);
-			Vector3 ndcC = Vector3::Transform(c, viewProjectionMatrix);
-			Vector3 screenA = Vector3::Transform(ndcA, viewportMatrix);
-			Vector3 screenB = Vector3::Transform(ndcB, viewportMatrix);
-			Vector3 screenC = Vector3::Transform(ndcC, viewportMatrix);
+			Vector3 screenA = Vector3::Transform(Vector3::Transform(a, viewProjectionMatrix), viewportMatrix);
+			Vector3 screenB = Vector3::Transform(Vector3::Transform(b, viewProjectionMatrix), viewportMatrix);
+			Vector3 screenC = Vector3::Transform(Vector3::Transform(c, viewProjectionMatrix), viewportMatrix);
 			Novice::DrawLine((int)screenA.x, (int)screenA.y, (int)screenB.x, (int)screenB.y, sphere.color);
 			Novice::DrawLine((int)screenA.x, (int)screenA.y, (int)screenC.x, (int)screenC.y, sphere.color);
 		}

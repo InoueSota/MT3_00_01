@@ -1,11 +1,11 @@
 #include <Novice.h>
 #include <imgui.h>
 #include "Matrix4x4.h"
-#include "Vector2.h"
 #include "Vector3.h"
 #include "Sphere.h"
+#include "Plane.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_00";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_02";
 const int kWindowWidth = 1280;
 const int kWindowHeight = 720;
 
@@ -28,8 +28,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraTranslate{ 0.0f,1.9f,-6.49f };
 	Vector3 cameraRotate{ 0.26f,0.0f,0.0f };
 
-	Sphere sphere1({-0.3f,0.0f,0.0f }, 0.5f);
-	Sphere sphere2({ 0.4f,0.1f,0.4f }, 0.3f);
+	Sphere sphere({ -0.3f,0.0f,0.0f }, 0.5f);
+	Plane plane{ {0.0f, 1.0f, 0.0f}, 1.0f };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -74,13 +74,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			isRotate = false;
 		}
 
-
-		// 球が当たってるか
-		if (Sphere::IsCollision(sphere1, sphere2)) {
-			sphere1.color = RED;
-		}
-		else {
-			sphere1.color = WHITE;
+		// 当たり判定
+		if (Plane::IsCollision(sphere, plane)) {
+			sphere.color = RED;
+		} else {
+			sphere.color = WHITE;
 		}
 
 		// 各種行列の計算
@@ -100,17 +98,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		Sphere::DrawGrid(worldViewProjectionMatrix, viewportMatrix);
-		Sphere::DrawSphere(sphere1, worldViewProjectionMatrix, viewportMatrix);
-		Sphere::DrawSphere(sphere2, worldViewProjectionMatrix, viewportMatrix);
-
-		Novice::ScreenPrintf(0, 0, "length : %f", Vector3::Length(sphere2.center - sphere1.center));
-		Novice::ScreenPrintf(0, 20, "radius : %f", sphere1.radius + sphere2.radius);
+		Sphere::DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix);
+		Plane::DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("Sphere1.center", &sphere1.center.x, 0.01f);
-		ImGui::DragFloat("Sphere1.radius", &sphere1.radius, 0.01f);
-		ImGui::DragFloat3("Segment origin", &sphere2.center.x, 0.01f);
-		ImGui::DragFloat("Segment diff", &sphere2.radius, 0.01f);
+		ImGui::DragFloat3("Sphere.Center", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("Sphere.Radius", &sphere.radius, 0.01f);
+		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
+		plane.normal = Vector3::Normalize(plane.normal);
 		ImGui::DragFloat3("cameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::End();
