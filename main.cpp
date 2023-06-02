@@ -3,10 +3,9 @@
 #include "Matrix4x4.h"
 #include "Vector3.h"
 #include "Sphere.h"
-#include "Line.h"
-#include "Triangle.h"
+#include "AABB.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_04";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_05";
 const int kWindowWidth = 1280;
 const int kWindowHeight = 720;
 
@@ -29,8 +28,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraTranslate{ 0.0f,1.9f,-6.49f };
 	Vector3 cameraRotate{ 0.26f,0.0f,0.0f };
 
-	Triangle triangle{ {{-1.0f,0.0f,0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f,0.0f,0.0f} }};
-	Segment segment{ {-0.3f, 0.5f, -0.1f}, {1.0f ,0.5f ,0.2f} };
+	AABB aabb1{
+		.min{-0.5f, -0.5f, -0.5f},
+		.max{ 0.0f,  0.0f,  0.0f},
+		.color = WHITE
+	};
+	AABB aabb2{
+		.min{ 0.2f, 0.2f, 0.2f},
+		.max{ 1.0f, 1.0f, 1.0f},
+		.color = WHITE
+	};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -60,13 +67,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		Novice::GetMousePosition(&x, &y);
 		if (preX != 0 && preY != 0 && isTranslate && !isRotate) {
-			cameraTranslate.x += std::cosf(cameraRotate.x) * (preX - x) * 0.001f;
-			cameraTranslate.y -= std::sinf(cameraRotate.y) * (preY - y) * 0.001f;
-			cameraTranslate.z -= std::sinf(cameraRotate.z) * (preY - y) * 0.001f;
+			cameraTranslate.x += std::cosf(cameraRotate.x) * (preX - x) * 0.002f;
+			cameraTranslate.y -= std::sinf(cameraRotate.y) * (preY - y) * 0.002f;
+			cameraTranslate.z -= std::sinf(cameraRotate.z) * (preY - y) * 0.002f;
 		}
 		if (preX != 0 && preY != 0 && isRotate && !isTranslate) {
-			cameraRotate.x -= (preY - y) * 0.001f;
-			cameraRotate.y -= (preX - x) * 0.001f;
+			cameraRotate.x -= (preY - y) * 0.002f;
+			cameraRotate.y -= (preX - x) * 0.002f;
 		}
 
 		// フラグ初期化
@@ -76,10 +83,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		// 当たり判定
-		if (Segment::IsCollision(segment, triangle)) {
-			segment.color = RED;
+		if (AABB::IsCollision(aabb1, aabb2)) {
+			aabb1.color = RED;
 		} else {
-			segment.color = WHITE;
+			aabb1.color = WHITE;
 		}
 
 		// 各種行列の計算
@@ -99,15 +106,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		Sphere::DrawGrid(worldViewProjectionMatrix, viewportMatrix);
-		Triangle::DrawTriangle(triangle, worldViewProjectionMatrix, viewportMatrix, WHITE);
-		Segment::DrawSegment(segment, worldViewProjectionMatrix, viewportMatrix);
+		AABB::DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix);
+		AABB::DrawAABB(aabb2, worldViewProjectionMatrix, viewportMatrix);
 
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("Triangle.v0", &triangle.vertices[0].x, 0.01f);
-		ImGui::DragFloat3("Triangle.v1", &triangle.vertices[1].x, 0.01f);
-		ImGui::DragFloat3("Triangle.v2", &triangle.vertices[2].x, 0.01f);
-		ImGui::DragFloat3("Segment.Origin", &segment.origin.x, 0.01f);
-		ImGui::DragFloat3("Segment.Diff", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("aabb1.min", &aabb1.min.x, 0.01f);
+		ImGui::DragFloat3("aabb1.max", &aabb1.max.x, 0.01f);
+		ImGui::DragFloat3("aabb2.min", &aabb2.min.x, 0.01f);
+		ImGui::DragFloat3("aabb2.max", &aabb2.max.x, 0.01f);
+		AABB::SafeParameter(aabb1);
+		AABB::SafeParameter(aabb2);
 		ImGui::DragFloat3("cameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::End();
