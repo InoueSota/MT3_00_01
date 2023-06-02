@@ -8,11 +8,6 @@
 class Sphere
 {
 public:
-	Sphere(const Vector3& center_, float radius_) {
-		center = center_;
-		radius = radius_;
-		color = WHITE;
-	}
 
 	/// <summary>
 	/// グリッド描画

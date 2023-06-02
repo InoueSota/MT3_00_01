@@ -28,14 +28,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraTranslate{ 0.0f,1.9f,-6.49f };
 	Vector3 cameraRotate{ 0.26f,0.0f,0.0f };
 
-	AABB aabb1{
+	AABB aabb{
 		.min{-0.5f, -0.5f, -0.5f},
 		.max{ 0.0f,  0.0f,  0.0f},
 		.color = WHITE
 	};
-	AABB aabb2{
-		.min{ 0.2f, 0.2f, 0.2f},
-		.max{ 1.0f, 1.0f, 1.0f},
+	Sphere sphere{
+		.center{0.5f, 0.5f, 0.0f},
+		.radius = 1.0f,
 		.color = WHITE
 	};
 
@@ -68,8 +68,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Novice::GetMousePosition(&x, &y);
 		if (preX != 0 && preY != 0 && isTranslate && !isRotate) {
 			cameraTranslate.x += std::cosf(cameraRotate.x) * (preX - x) * 0.002f;
-			cameraTranslate.y -= std::sinf(cameraRotate.y) * (preY - y) * 0.002f;
-			cameraTranslate.z -= std::sinf(cameraRotate.z) * (preY - y) * 0.002f;
+			cameraTranslate.y += std::sinf(cameraRotate.y) * (preY - y) * 0.002f;
+			cameraTranslate.z += std::sinf(cameraRotate.z) * (preY - y) * 0.002f;
 		}
 		if (preX != 0 && preY != 0 && isRotate && !isTranslate) {
 			cameraRotate.x -= (preY - y) * 0.002f;
@@ -83,10 +83,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		// 当たり判定
-		if (AABB::IsCollision(aabb1, aabb2)) {
-			aabb1.color = RED;
+		if (AABB::IsCollision(aabb, sphere)) {
+			aabb.color = RED;
 		} else {
-			aabb1.color = WHITE;
+			aabb.color = WHITE;
 		}
 
 		// 各種行列の計算
@@ -106,16 +106,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		Sphere::DrawGrid(worldViewProjectionMatrix, viewportMatrix);
-		AABB::DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix);
-		AABB::DrawAABB(aabb2, worldViewProjectionMatrix, viewportMatrix);
+		AABB::DrawAABB(aabb, worldViewProjectionMatrix, viewportMatrix);
+		Sphere::DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix);
 
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("aabb1.min", &aabb1.min.x, 0.01f);
-		ImGui::DragFloat3("aabb1.max", &aabb1.max.x, 0.01f);
-		ImGui::DragFloat3("aabb2.min", &aabb2.min.x, 0.01f);
-		ImGui::DragFloat3("aabb2.max", &aabb2.max.x, 0.01f);
-		AABB::SafeParameter(aabb1);
-		AABB::SafeParameter(aabb2);
+		ImGui::DragFloat3("aabb1.min", &aabb.min.x, 0.01f);
+		ImGui::DragFloat3("aabb1.max", &aabb.max.x, 0.01f);
+		AABB::SafeParameter(aabb);
+		ImGui::DragFloat3("sphere.center", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("sphere.radius", &sphere.radius, 0.01f);
 		ImGui::DragFloat3("cameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::End();

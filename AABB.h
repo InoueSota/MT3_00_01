@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector3.h"
 
+class Sphere;
 struct AABB {
 
 	// 最小点
@@ -19,6 +20,11 @@ struct AABB {
 	/// AABB同士の当たり判定
 	/// </summary>
 	static bool IsCollision(const AABB& aabb1, const AABB& aabb2);
+
+	/// <summary>
+	/// 球との当たり判定
+	/// </summary>
+	static bool IsCollision(const AABB& aabb, const Sphere& sphere);
 
 	/// <summary>
 	/// AABB描画
