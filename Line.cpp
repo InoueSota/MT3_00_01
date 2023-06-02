@@ -1,6 +1,7 @@
 #include "Line.h"
 #include <Novice.h>
 #include "Plane.h"
+#include "Triangle.h"
 
 
 bool Line::IsCollision(const Line& line, const Plane& plane) {
@@ -48,6 +49,46 @@ bool Segment::IsCollision(const Segment& segment, const Plane& plane) {
 	float t = (plane.distance - Vector3::Dot(segment.origin, plane.normal)) / dot;
 	if (0.0f <= t && t <= 1.0f) {
 		return true;
+	}
+	return false;
+}
+
+bool Segment::IsCollision(const Segment& segment, const Triangle& triangle)
+{
+	// 三角形の各頂点を結ぶベクトルを求める
+	Vector3 v01 = triangle.vertices[1] - triangle.vertices[0];
+	Vector3 v12 = triangle.vertices[2] - triangle.vertices[1];
+
+	// 平面を生成する
+	Vector3 normal = Vector3::Normalize(Vector3::Cross(v01, v12));
+	float distance = Vector3::Dot(triangle.vertices[0], normal);
+	Plane tmpPlane{ normal, distance };
+
+	// 平面との当たり判定を取る
+	if (IsCollision(segment, tmpPlane)) {
+
+		// 衝突点
+		float t = (distance - Vector3::Dot(segment.origin, normal)) / Vector3::Dot(segment.diff, normal);
+		Vector3 point = segment.origin + segment.diff * t;
+
+		// 当たっている場所と三角形の頂点で3つの三角形を作る
+		Vector3 v0p = point - triangle.vertices[0];
+		Vector3 v1p = point - triangle.vertices[1];
+		Vector3 v2p = point - triangle.vertices[2];
+		Vector3 v20 = triangle.vertices[0] - triangle.vertices[2];
+
+		// それぞれの向きを求める
+		Vector3 cross01 = Vector3::Cross(v01, v1p);
+		Vector3 cross12 = Vector3::Cross(v12, v2p);
+		Vector3 cross20 = Vector3::Cross(v20, v0p);
+
+		// 全てのクロス積と法線が同じ向きなら衝突
+		if (Vector3::Dot(cross01, normal) >= 0.0f &&
+			Vector3::Dot(cross12, normal) >= 0.0f &&
+			Vector3::Dot(cross20, normal) >= 0.0f) {
+			return true;
+		}
+		return false;
 	}
 	return false;
 }

@@ -2,6 +2,7 @@
 #include "Vector3.h"
 
 struct Plane;
+struct Triangle;
 
 struct Line {
 	// 始点
@@ -13,6 +14,11 @@ struct Line {
 	/// 平面との当たり判定
 	/// </summary>
 	static bool IsCollision(const Line& line, const Plane& plane);
+
+	/// <summary>
+	/// 三角形との当たり判定
+	/// </summary>
+	static bool IsCollision(const Line& line, const Triangle& triangle);
 
 };
 
@@ -26,6 +32,11 @@ struct Ray {
 	/// 平面との当たり判定
 	/// </summary>
 	static bool IsCollision(const Ray& ray, const Plane& plane);
+
+	/// <summary>
+	/// 三角形との当たり判定
+	/// </summary>
+	static bool IsCollision(const Ray& ray, const Triangle& triangle);
 
 };
 
@@ -56,6 +67,11 @@ struct Segment {
 	/// 平面との当たり判定
 	/// </summary>
 	static bool IsCollision(const Segment& segment, const Plane& plane);
+
+	/// <summary>
+	/// 三角形との当たり判定
+	/// </summary>
+	static bool IsCollision(const Segment& segment, const Triangle& triangle);
 
 	/// <summary>
 	/// 線分描画

@@ -4,9 +4,9 @@
 #include "Vector3.h"
 #include "Sphere.h"
 #include "Line.h"
-#include "Plane.h"
+#include "Triangle.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_02";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_04";
 const int kWindowWidth = 1280;
 const int kWindowHeight = 720;
 
@@ -29,8 +29,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraTranslate{ 0.0f,1.9f,-6.49f };
 	Vector3 cameraRotate{ 0.26f,0.0f,0.0f };
 
-	Plane plane{ {0.0f, 1.0f, 0.0f}, 1.0f };
-	Segment segment{ {-0.3f, 0.5f, 0.0f}, {1.0f ,0.5f ,0.0f} };
+	Triangle triangle{ {{-1.0f,0.0f,0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f,0.0f,0.0f} }};
+	Segment segment{ {-0.3f, 0.5f, -0.1f}, {1.0f ,0.5f ,0.2f} };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -76,7 +76,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		// 当たり判定
-		if (Segment::IsCollision(segment, plane)) {
+		if (Segment::IsCollision(segment, triangle)) {
 			segment.color = RED;
 		} else {
 			segment.color = WHITE;
@@ -99,12 +99,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		Sphere::DrawGrid(worldViewProjectionMatrix, viewportMatrix);
-		Plane::DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
+		Triangle::DrawTriangle(triangle, worldViewProjectionMatrix, viewportMatrix, WHITE);
 		Segment::DrawSegment(segment, worldViewProjectionMatrix, viewportMatrix);
 
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
-		plane.normal = Vector3::Normalize(plane.normal);
+		ImGui::DragFloat3("Triangle.v0", &triangle.vertices[0].x, 0.01f);
+		ImGui::DragFloat3("Triangle.v1", &triangle.vertices[1].x, 0.01f);
+		ImGui::DragFloat3("Triangle.v2", &triangle.vertices[2].x, 0.01f);
 		ImGui::DragFloat3("Segment.Origin", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("Segment.Diff", &segment.diff.x, 0.01f);
 		ImGui::DragFloat3("cameraTranslate", &cameraTranslate.x, 0.01f);
