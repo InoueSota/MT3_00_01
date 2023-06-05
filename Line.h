@@ -3,12 +3,16 @@
 
 struct Plane;
 struct Triangle;
+struct AABB;
 
 struct Line {
+
 	// 始点
 	Vector3 origin;
 	// 終点への差分ベクトル
 	Vector3 diff;
+	// 色
+	uint32_t color;
 
 	/// <summary>
 	/// 平面との当たり判定
@@ -23,10 +27,13 @@ struct Line {
 };
 
 struct Ray {
+
 	// 始点
 	Vector3 origin;
 	// 終点への差分ベクトル
 	Vector3 diff;
+	// 色
+	uint32_t color;
 
 	/// <summary>
 	/// 平面との当たり判定
@@ -41,10 +48,6 @@ struct Ray {
 };
 
 struct Segment {
-	Segment(const Vector3& origin_, const Vector3& diff_) {
-		origin = origin_;
-		diff = diff_;
-	};
 
 	// 始点
 	Vector3 origin;
@@ -72,6 +75,11 @@ struct Segment {
 	/// 三角形との当たり判定
 	/// </summary>
 	static bool IsCollision(const Segment& segment, const Triangle& triangle);
+
+	/// <summary>
+	/// AABBとの当たり判定
+	/// </summary>
+	static bool IsCollision(const Segment& segment, const AABB& aabb);
 
 	/// <summary>
 	/// 線分描画

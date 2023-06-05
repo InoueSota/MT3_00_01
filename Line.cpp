@@ -2,6 +2,7 @@
 #include <Novice.h>
 #include "Plane.h"
 #include "Triangle.h"
+#include "AABB.h"
 
 
 bool Line::IsCollision(const Line& line, const Plane& plane) {
@@ -175,6 +176,85 @@ bool Segment::IsCollision(const Segment& segment, const Triangle& triangle)
 		return false;
 	}
 	return false;
+}
+
+bool Segment::IsCollision(const Segment& segment, const AABB& aabb)
+{
+
+	if (segment.diff.x == 0.0f || segment.diff.y == 0.0f || segment.diff.z == 0.0f) {
+		
+		// 終点を求める
+		Vector3 end = segment.origin + segment.diff;
+
+		// X軸に平行のとき
+		if (segment.diff.y == 0.0f && segment.diff.z == 0.0f) {
+			
+			// 範囲内か判定
+			if (((aabb.min.x <= segment.origin.x && aabb.max.x >= segment.origin.x)  ||
+				 (aabb.min.x <= end.x && aabb.max.x >= end.x)) &&
+				 (aabb.min.y <= segment.origin.y && aabb.max.y >= segment.origin.y)  &&
+				 (aabb.min.z <= segment.origin.z && aabb.max.z >= segment.origin.z)) {
+				return true;
+			}
+			return false;
+		}
+
+		// Y軸に平行のとき
+		if (segment.diff.x == 0.0f && segment.diff.z == 0.0f) {
+
+			// 範囲内か判定
+			if (((aabb.min.y <= segment.origin.y && aabb.max.y >= segment.origin.y) ||
+				(aabb.min.y <= end.y && aabb.max.y >= end.y)) &&
+				(aabb.min.x <= segment.origin.x && aabb.max.x >= segment.origin.x) &&
+				(aabb.min.z <= segment.origin.z && aabb.max.z >= segment.origin.z)) {
+				return true;
+			}
+			return false;
+		}
+
+		// Z軸に平行のとき
+		if (segment.diff.x == 0.0f && segment.diff.y == 0.0f) {
+
+			// 範囲内か判定
+			if (((aabb.min.z <= segment.origin.z && aabb.max.z >= segment.origin.z) ||
+				(aabb.min.z <= end.z && aabb.max.z >= end.z)) &&
+				(aabb.min.x <= segment.origin.x && aabb.max.x >= segment.origin.x) &&
+				(aabb.min.y <= segment.origin.y && aabb.max.y >= segment.origin.y)) {
+				return true;
+			}
+			return false;
+		}
+	}
+
+	// AABBの各軸と線の判定
+	float tXmin = (aabb.min.x - segment.origin.x) / segment.diff.x;
+	float tXmax = (aabb.max.x - segment.origin.x) / segment.diff.x;
+	float tYmin = (aabb.min.y - segment.origin.y) / segment.diff.y;
+	float tYmax = (aabb.max.y - segment.origin.y) / segment.diff.y;
+	float tZmin = (aabb.min.z - segment.origin.z) / segment.diff.z;
+	float tZmax = (aabb.max.z - segment.origin.z) / segment.diff.z;
+
+	// 近い方、遠い方を求める
+	float tNearX = (std::min)(tXmin, tXmax);
+	float tFarX = (std::max)(tXmin, tXmax);
+	float tNearY = (std::min)(tYmin, tYmax);
+	float tFarY = (std::max)(tYmin, tYmax);
+	float tNearZ = (std::min)(tZmin, tZmax);
+	float tFarZ = (std::max)(tZmin, tZmax);
+
+	// AABBとの衝突点のtが小さいのを求める
+	float tmin = (std::max)((std::max)(tNearX, tNearY), tNearZ);
+	// AABBとの衝突点のtが大きいのを求める
+	float tmax = (std::min)((std::min)(tFarX, tFarY), tFarZ);
+
+	// 近い方の大きい方 > 遠い方の小さい方 なら衝突していない
+	if (tmin > tmax) { return false; }
+
+	// 線分の条件
+	if ((tmin < 0.0f && tmax < 0.0f) || (tmin > 1.0f && tmax > 1.0f)) { return false; }
+
+	// 条件を抜けたら衝突
+	return true;
 }
 
 void Segment::DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {

@@ -4,8 +4,9 @@
 #include "Vector3.h"
 #include "Sphere.h"
 #include "AABB.h"
+#include "Line.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_05";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_07";
 const int kWindowWidth = 1280;
 const int kWindowHeight = 720;
 
@@ -30,12 +31,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	AABB aabb{
 		.min{-0.5f, -0.5f, -0.5f},
-		.max{ 0.0f,  0.0f,  0.0f},
+		.max{ 0.5f,  0.5f,  0.5f},
 		.color = WHITE
 	};
-	Sphere sphere{
-		.center{0.5f, 0.5f, 0.0f},
-		.radius = 1.0f,
+	Segment segment{
+		.origin{0.7f, 0.3f, 0.1f},
+		.diff{1.0f, -0.5f, 0.1f},
 		.color = WHITE
 	};
 
@@ -83,7 +84,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		// 当たり判定
-		if (AABB::IsCollision(aabb, sphere)) {
+		if (Segment::IsCollision(segment, aabb)) {
 			aabb.color = RED;
 		} else {
 			aabb.color = WHITE;
@@ -107,14 +108,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		Sphere::DrawGrid(worldViewProjectionMatrix, viewportMatrix);
 		AABB::DrawAABB(aabb, worldViewProjectionMatrix, viewportMatrix);
-		Sphere::DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix);
+		Segment::DrawSegment(segment, worldViewProjectionMatrix, viewportMatrix);
 
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("aabb1.min", &aabb.min.x, 0.01f);
 		ImGui::DragFloat3("aabb1.max", &aabb.max.x, 0.01f);
 		AABB::SafeParameter(aabb);
-		ImGui::DragFloat3("sphere.center", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("sphere.radius", &sphere.radius, 0.01f);
+		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
 		ImGui::DragFloat3("cameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::End();
