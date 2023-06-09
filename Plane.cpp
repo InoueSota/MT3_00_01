@@ -24,12 +24,3 @@ void Plane::DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix,
 	Novice::DrawLine((int)points[3].x, (int)points[3].y, (int)points[0].x, (int)points[0].y, color);
 }
 
-bool Plane::IsCollision(const Sphere& sphere, const Plane& plane) {
-	Vector3 normal = Vector3(plane.normal);
-	float distance = std::abs(Vector3::Dot(normal, sphere.center) - plane.distance);
-
-	if (distance <= sphere.radius) {
-		return true;
-	}
-	return false;
-}

@@ -3,38 +3,6 @@
 #include <math.h>
 
 
-
-// グリッド描画
-void Sphere::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
-	const float kGridHalWidth = 2.0f;
-	const uint32_t kSubdivision = 10;
-	const float kGridEvery = (kGridHalWidth * 2.0f) / float(kSubdivision);
-
-	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
-		Vector3 worldStartPosition = { -kGridEvery * kSubdivision / 2.0f, 0.0f, kGridEvery * (xIndex - kSubdivision / 2.0f) };
-		Vector3 worldEndPosition = { kGridEvery * kSubdivision / 2.0f, 0.0f, kGridEvery * (xIndex - kSubdivision / 2.0f) };
-		Vector3 screenStartPosition = Vector3::Transform(Vector3::Transform(worldStartPosition, viewProjectionMatrix), viewportMatrix);
-		Vector3 screenEndPosition = Vector3::Transform(Vector3::Transform(worldEndPosition, viewProjectionMatrix), viewportMatrix);
-		if (xIndex == kSubdivision / 2) {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, BLACK);
-		} else {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, 0xAAAAAAFF);
-		}
-	}
-
-	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
-		Vector3 worldStartPosition = { kGridEvery * (zIndex - kSubdivision / 2.0f), 0.0f, -kGridEvery * kSubdivision / 2.0f };
-		Vector3 worldEndPosition = { kGridEvery * (zIndex - kSubdivision / 2.0f), 0.0f, kGridEvery * kSubdivision / 2.0f };
-		Vector3 screenStartPosition = Vector3::Transform(Vector3::Transform(worldStartPosition, viewProjectionMatrix), viewportMatrix);
-		Vector3 screenEndPosition = Vector3::Transform(Vector3::Transform(worldEndPosition, viewProjectionMatrix), viewportMatrix);
-		if (zIndex == kSubdivision / 2) {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, BLACK);
-		} else {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, 0xAAAAAAFF);
-		}
-	}
-}
-
 // 球描画
 void Sphere::DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
 	const uint32_t kSubdivision = 16;
@@ -57,17 +25,4 @@ void Sphere::DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMat
 			Novice::DrawLine((int)screenA.x, (int)screenA.y, (int)screenC.x, (int)screenC.y, sphere.color);
 		}
 	}
-}
-
-// 球同士当たり判定
-bool Sphere::IsCollision(const Sphere& s1, const Sphere& s2) {
-
-	// 2つの球の中心点間の距離を求める
-	float distance = Vector3::Length(s2.center - s1.center);
-
-	// 半径の合計よりも短ければ衝突
-	if (distance <= s1.radius + s2.radius) {
-		return true;
-	}
-	return false;
 }

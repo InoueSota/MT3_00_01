@@ -1,8 +1,10 @@
 #include <Novice.h>
 #include <imgui.h>
+#include "Input.h"
 #include "Matrix4x4.h"
 #include "Vector3.h"
-#include "Sphere.h"
+#include "Vector2.h"
+#include "CollisionManager.h"
 #include "AABB.h"
 #include "Line.h"
 
@@ -20,9 +22,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	int preX = 0, preY = 0;
-	int x = 0, y = 0;
-	bool isTranslate = false, isRotate = false;
+	// マウスで3D空間を制御する
+	enum MOUSE
+	{
+		LEFT,
+		RIGHT,
+		CENTER
+	};
+	Input* input = nullptr;
+	input = Input::GetInstance();
 
 	Vector3 rotate{ 0.0f,0.0f,0.0f };
 	Vector3 translate{ 0.0f,-0.1f,0.0f };
@@ -53,38 +61,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		// カメラを動かす（ムズ）
-		if (Novice::IsPressMouse(2) && (keys[DIK_LSHIFT] || keys[DIK_RSHIFT])) {
-			preX = x;
-			preY = y;
-			isTranslate = true;
-		} else if (Novice::IsPressMouse(2)) {
-			preX = x;
-			preY = y;
-			isRotate = true;
-		} else {
-			preX = 0;
-			preY = 0;
-		}
-		Novice::GetMousePosition(&x, &y);
-		if (preX != 0 && preY != 0 && isTranslate && !isRotate) {
-			cameraTranslate.x += std::cosf(cameraRotate.x) * (preX - x) * 0.002f;
-			cameraTranslate.y += std::sinf(cameraRotate.y) * (preY - y) * 0.002f;
-			cameraTranslate.z += std::sinf(cameraRotate.z) * (preY - y) * 0.002f;
-		}
-		if (preX != 0 && preY != 0 && isRotate && !isTranslate) {
-			cameraRotate.x -= (preY - y) * 0.002f;
-			cameraRotate.y -= (preX - x) * 0.002f;
-		}
-
-		// フラグ初期化
-		if (!Novice::IsPressMouse(2)) {
-			isTranslate = false;
-			isRotate = false;
-		}
-
 		// 当たり判定
-		if (Segment::IsCollision(segment, aabb)) {
+		if (IsCollision(segment, aabb)) {
 			aabb.color = RED;
 		} else {
 			aabb.color = WHITE;
@@ -92,11 +70,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 各種行列の計算
 		Matrix4x4 worldMatrix = Matrix4x4::MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, rotate, translate);
-		Matrix4x4 cameraMatrix = Matrix4x4::MakeAffineMatrix({ 1.0f,1.0f,1.0f }, cameraRotate, cameraTranslate);
+		Matrix4x4 cameraMatrix = Matrix4x4::MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
 		Matrix4x4 viewMatrix = Matrix4x4::Inverse(cameraMatrix);
 		Matrix4x4 projectionMatrix = Matrix4x4::MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 		Matrix4x4 worldViewProjectionMatrix = Matrix4x4::Multiply(worldMatrix, Matrix4x4::Multiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = Matrix4x4::MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
+
+
+		// カメラ移動
+		if (Novice::IsPressMouse(CENTER)) {
+			cameraTranslate += Vector3::Transform({ -static_cast<float>(input->GetMouseMove().lX), static_cast<float>(input->GetMouseMove().lY), 0.0f }, Matrix4x4::Inverse(viewMatrix)) * 0.001f;
+		}
+
+		// ドリーイン、ドリーアウト
+		cameraTranslate += Vector3::GetZaxis(Matrix4x4::MakeRotateMatrix(cameraRotate)) * static_cast<float>(input->GetWheel()) * 0.002f;
+
+		// カメラ回転
+		if (Novice::IsPressMouse(RIGHT)) {
+			cameraRotate.x += static_cast<float>(input->GetMouseMove().lY) * 0.001f;
+			cameraRotate.y += static_cast<float>(input->GetMouseMove().lX) * 0.001f;
+		}
 
 		///
 		/// ↑更新処理ここまで
@@ -106,19 +99,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		Sphere::DrawGrid(worldViewProjectionMatrix, viewportMatrix);
+		DrawGrid(worldViewProjectionMatrix, viewportMatrix);
 		AABB::DrawAABB(aabb, worldViewProjectionMatrix, viewportMatrix);
 		Segment::DrawSegment(segment, worldViewProjectionMatrix, viewportMatrix);
 
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("aabb1.min", &aabb.min.x, 0.01f);
-		ImGui::DragFloat3("aabb1.max", &aabb.max.x, 0.01f);
-		AABB::SafeParameter(aabb);
-		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
-		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
 		ImGui::DragFloat3("cameraTranslate", &cameraTranslate.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::End();
+
+		Novice::ScreenPrintf(0,  0, "CameraMove   : Mouse Center");
+		Novice::ScreenPrintf(0, 20, "CameraRotate : Mouse Right");
+		Novice::ScreenPrintf(0, 40, "Dolly In,Out : Mouse Wheel");
 
 		///
 		/// ↑描画処理ここまで
