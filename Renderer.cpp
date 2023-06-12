@@ -50,26 +50,47 @@ void Renderer::DrawGrid() {
 	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
 		Vector3 worldStartPosition = { -kGridEvery * kSubdivision / 2.0f, 0.0f, kGridEvery * (xIndex - kSubdivision / 2.0f) };
 		Vector3 worldEndPosition = { kGridEvery * kSubdivision / 2.0f, 0.0f, kGridEvery * (xIndex - kSubdivision / 2.0f) };
-		Vector3 screenStartPosition = Vector3::Transform(Vector3::Transform(worldStartPosition, worldViewProjectionMatrix), viewportMatrix);
-		Vector3 screenEndPosition = Vector3::Transform(Vector3::Transform(worldEndPosition, worldViewProjectionMatrix), viewportMatrix);
 		if (xIndex == kSubdivision / 2) {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, BLACK);
+			ScreenLine(worldStartPosition, worldEndPosition, BLACK);
 		}
 		else {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, 0xAAAAAAFF);
+			ScreenLine(worldStartPosition, worldEndPosition, 0xAAAAAAFF);
 		}
 	}
 
 	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
 		Vector3 worldStartPosition = { kGridEvery * (zIndex - kSubdivision / 2.0f), 0.0f, -kGridEvery * kSubdivision / 2.0f };
 		Vector3 worldEndPosition = { kGridEvery * (zIndex - kSubdivision / 2.0f), 0.0f, kGridEvery * kSubdivision / 2.0f };
-		Vector3 screenStartPosition = Vector3::Transform(Vector3::Transform(worldStartPosition, worldViewProjectionMatrix), viewportMatrix);
-		Vector3 screenEndPosition = Vector3::Transform(Vector3::Transform(worldEndPosition, worldViewProjectionMatrix), viewportMatrix);
 		if (zIndex == kSubdivision / 2) {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, BLACK);
+			ScreenLine(worldStartPosition, worldEndPosition, BLACK);
 		}
 		else {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, 0xAAAAAAFF);
+			ScreenLine(worldStartPosition, worldEndPosition, 0xAAAAAAFF);
 		}
 	}
+}
+
+void Renderer::ScreenLine(const Vector3& start, const Vector3& end, uint32_t color)
+{
+	// スクリーン空間に変換する
+	Matrix4x4 transformMatrix = worldViewProjectionMatrix * viewportMatrix;
+	Vector3 screenStart = Vector3::Transform(start, transformMatrix);
+	Vector3 screenEnd = Vector3::Transform(end, transformMatrix);
+
+	// 描画する
+	Novice::DrawLine(static_cast<int>(screenStart.x), static_cast<int>(screenStart.y), static_cast<int>(screenEnd.x), static_cast<int>(screenEnd.y), color);
+}
+
+void Renderer::ScreenTriangle(const Vector3 vertex[3], uint32_t color)
+{
+	// スクリーン空間に変換する
+	Matrix4x4 transformMatrix = worldViewProjectionMatrix * viewportMatrix;
+	Vector3 screenVertex[] = {
+		Vector3::Transform(vertex[0], transformMatrix),
+		Vector3::Transform(vertex[1], transformMatrix),
+		Vector3::Transform(vertex[2], transformMatrix)
+	};
+
+	// 描画する
+	Novice::DrawTriangle(static_cast<int>(vertex[0].x), static_cast<int>(vertex[0].y), static_cast<int>(vertex[1].x), static_cast<int>(vertex[1].y), static_cast<int>(vertex[2].x), static_cast<int>(vertex[2].y), color, kFillModeWireFrame);
 }

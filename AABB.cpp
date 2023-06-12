@@ -13,31 +13,25 @@ void AABB::SafeParameter(AABB& aabb)
     aabb.max.z = (std::max)(aabb.min.z, aabb.max.z);
 }
 
-void AABB::DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix)
+void AABB::DrawAABB(Renderer& renderer, const AABB& aabb)
 {
-    // zがmin（手前）
-    Vector3 frontLeftTop = Vector3::Transform(Vector3::Transform({ aabb.min.x, aabb.max.y, aabb.min.z }, viewProjectionMatrix), viewportMatrix);
-    Vector3 frontRightTop = Vector3::Transform(Vector3::Transform({ aabb.max.x, aabb.max.y, aabb.min.z }, viewProjectionMatrix), viewportMatrix);
-    Vector3 frontLeftBottom = Vector3::Transform(Vector3::Transform({ aabb.min.x, aabb.min.y, aabb.min.z }, viewProjectionMatrix), viewportMatrix);
-    Vector3 frontRightBottom = Vector3::Transform(Vector3::Transform({ aabb.max.x, aabb.min.y, aabb.min.z }, viewProjectionMatrix), viewportMatrix);
-    Novice::DrawLine((int)frontLeftTop.x, (int)frontLeftTop.y, (int)frontRightTop.x, (int)frontRightTop.y, aabb.color);
-    Novice::DrawLine((int)frontRightTop.x, (int)frontRightTop.y, (int)frontRightBottom.x, (int)frontRightBottom.y, aabb.color);
-    Novice::DrawLine((int)frontRightBottom.x, (int)frontRightBottom.y, (int)frontLeftBottom.x, (int)frontLeftBottom.y, aabb.color);
-    Novice::DrawLine((int)frontLeftBottom.x, (int)frontLeftBottom.y, (int)frontLeftTop.x, (int)frontLeftTop.y, aabb.color);
+    Vector3 vertices[] = {
+            { aabb.min.x,  aabb.max.y, aabb.min.z },
+            {  aabb.max.x,  aabb.max.y, aabb.min.z },
+            {  aabb.max.x, aabb.min.y, aabb.min.z },
+            -aabb.min,
 
-    // zがmax（奥）
-    Vector3 backLeftTop = Vector3::Transform(Vector3::Transform({ aabb.min.x, aabb.max.y, aabb.max.z }, viewProjectionMatrix), viewportMatrix);
-    Vector3 backRightTop = Vector3::Transform(Vector3::Transform({ aabb.max.x, aabb.max.y, aabb.max.z }, viewProjectionMatrix), viewportMatrix);
-    Vector3 backLeftBottom = Vector3::Transform(Vector3::Transform({ aabb.min.x, aabb.min.y, aabb.max.z }, viewProjectionMatrix), viewportMatrix);
-    Vector3 backRightBottom = Vector3::Transform(Vector3::Transform({ aabb.max.x, aabb.min.y, aabb.max.z }, viewProjectionMatrix), viewportMatrix);
-    Novice::DrawLine((int)backLeftTop.x, (int)backLeftTop.y, (int)backRightTop.x, (int)backRightTop.y, aabb.color);
-    Novice::DrawLine((int)backRightTop.x, (int)backRightTop.y, (int)backRightBottom.x, (int)backRightBottom.y, aabb.color);
-    Novice::DrawLine((int)backRightBottom.x, (int)backRightBottom.y, (int)backLeftBottom.x, (int)backLeftBottom.y, aabb.color);
-    Novice::DrawLine((int)backLeftBottom.x, (int)backLeftBottom.y, (int)backLeftTop.x, (int)backLeftTop.y, aabb.color);
+            { aabb.min.x,  aabb.max.y, aabb.max.z },
+            aabb.max,
+            {  aabb.max.x, aabb.min.y, aabb.max.z },
+            { aabb.min.x, aabb.min.y, aabb.max.z }
+    };
 
-    // 手前と奥を繋ぐ線
-    Novice::DrawLine((int)frontLeftTop.x, (int)frontLeftTop.y, (int)backLeftTop.x, (int)backLeftTop.y, aabb.color);
-    Novice::DrawLine((int)frontRightTop.x, (int)frontRightTop.y, (int)backRightTop.x, (int)backRightTop.y, aabb.color);
-    Novice::DrawLine((int)frontLeftBottom.x, (int)frontLeftBottom.y, (int)backLeftBottom.x, (int)backLeftBottom.y, aabb.color);
-    Novice::DrawLine((int)frontRightBottom.x, (int)frontRightBottom.y, (int)backRightBottom.x, (int)backRightBottom.y, aabb.color);
+    for (uint32_t i = 0; i < 4; i++)
+    {
+        uint32_t j = (i + 1) % 4;
+        renderer.ScreenLine(vertices[i], vertices[j], aabb.color);
+        renderer.ScreenLine(vertices[i], vertices[i + 4], aabb.color);
+        renderer.ScreenLine(vertices[i + 4], vertices[j + 4], aabb.color);
+    }
 }

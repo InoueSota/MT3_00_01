@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector3.h"
+#include "Renderer.h"
 
 struct OBB
 {
@@ -30,5 +31,5 @@ struct OBB
 	/// <summary>
 	/// OBB描画
 	/// </summary>
-	static void Draw(const OBB& obb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
+	static void Draw(Renderer& renderer, const OBB& obb);
 };

@@ -3,7 +3,7 @@
 #include <Novice.h>
 
 
-void Plane::DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+void Plane::DrawPlane(Renderer& renderer, const Plane& plane, uint32_t color) {
 	Vector3 center = Vector3::Multiply(plane.distance, plane.normal);
 	Vector3 perpendiculars[4];
 	perpendiculars[0] = Vector3::Normalize(Vector3::Perpendicular(plane.normal));
@@ -15,12 +15,12 @@ void Plane::DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix,
 	for (int32_t index = 0; index < 4; ++index) {
 		Vector3 extend = Vector3::Multiply(2.0f, perpendiculars[index]);
 		Vector3 point = Vector3::Add(center, extend);
-		points[index] = Vector3::Transform(Vector3::Transform(point, viewProjectionMatrix), viewportMatrix);
+		points[index] = point;
 	}
 
-	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[2].x, (int)points[2].y, color);
-	Novice::DrawLine((int)points[2].x, (int)points[2].y, (int)points[1].x, (int)points[1].y, color);
-	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[3].x, (int)points[3].y, color);
-	Novice::DrawLine((int)points[3].x, (int)points[3].y, (int)points[0].x, (int)points[0].y, color);
+	renderer.ScreenLine(points[0], points[2], color);
+	renderer.ScreenLine(points[1], points[3], color);
+	renderer.ScreenLine(points[2], points[1], color);
+	renderer.ScreenLine(points[3], points[0], color);
 }
 

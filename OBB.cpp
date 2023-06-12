@@ -34,7 +34,7 @@ Matrix4x4 OBB::MakeInverse(const Matrix4x4& rotation, const Vector3& translate)
     return transposeRotation;
 }
 
-void OBB::Draw(const OBB& obb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix)
+void OBB::Draw(Renderer& renderer, const OBB& obb)
 {
     Vector3 vertices[] = {
             { -obb.size.x,  obb.size.y, -obb.size.z },
@@ -55,18 +55,16 @@ void OBB::Draw(const OBB& obb, const Matrix4x4& viewProjectionMatrix, const Matr
         obb.center.x, obb.center.y, obb.center.z, 1.0f
     };
 
-    Matrix4x4 transformMatrix = tmpMatrix * viewProjectionMatrix * viewportMatrix;
-    
     for (auto& vertex : vertices)
     {
-        vertex = Vector3::Transform(vertex, transformMatrix);
+        vertex = Vector3::Transform(vertex, tmpMatrix);
     }
 
     for (uint32_t i = 0; i < 4; i++)
     {
         uint32_t j = (i + 1) % 4;
-        Novice::DrawLine((int)vertices[i].x, (int)vertices[i].y, (int)vertices[j].x, (int)vertices[j].y, obb.color);
-        Novice::DrawLine((int)vertices[i].x, (int)vertices[i].y, (int)vertices[i + 4].x, (int)vertices[i + 4].y, obb.color);
-        Novice::DrawLine((int)vertices[i + 4].x, (int)vertices[i + 4].y, (int)vertices[j + 4].x, (int)vertices[j + 4].y, obb.color);
+        renderer.ScreenLine(vertices[i], vertices[j], obb.color);
+        renderer.ScreenLine(vertices[i], vertices[i + 4], obb.color);
+        renderer.ScreenLine(vertices[i + 4], vertices[j + 4], obb.color);
     }
 }

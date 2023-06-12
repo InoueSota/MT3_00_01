@@ -1,6 +1,6 @@
 #pragma once
 #include "Vector3.h"
-
+#include "Renderer.h"
 
 struct Plane
 {
@@ -12,6 +12,6 @@ struct Plane
 	/// <summary>
 	/// 球描画
 	/// </summary>
-	static void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+	static void DrawPlane(Renderer& renderer, const Plane& plane, uint32_t color);
 };
 

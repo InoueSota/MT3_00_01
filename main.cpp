@@ -22,20 +22,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Renderer renderer;
 	renderer.Initialize();
 
-	OBB obb{
-		.center{ -1.0f, 0.0f, 0.0f },
-		.orientations = {{ 1.0f, 0.0f, 0.0f },
-						 { 0.0f, 1.0f, 0.0f },
-						 { 0.0f, 0.0f, 1.0f }},
-		.size{ 0.5f, 0.5f, 0.5f },
-		.color = WHITE
-	};
-	Segment segment{
-		.origin{-0.8f, -0.3f, 0.0f},
-		.diff{0.5f, 0.5f, 0.5f},
-		.color = WHITE
-	};
-
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -51,16 +37,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		renderer.Update();
 
-		// OBBの軸を作る
-		OBB::MakeOrientations(obb, renderer.rotate);
-
-		// 当たり判定
-		if (IsCollision(segment, obb)) {
-			obb.color = RED;
-		} else {
-			obb.color = WHITE;
-		}
-
 		///
 		/// ↑更新処理ここまで
 		///
@@ -70,18 +46,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		renderer.Draw();
-
-		OBB::Draw(obb, renderer.worldViewProjectionMatrix, renderer.viewportMatrix);
-		Segment::Draw(segment, renderer.worldViewProjectionMatrix, renderer.viewportMatrix);
-
-		ImGui::Begin("Window");
-		ImGui::DragFloat3("rotate", &renderer.rotate.x, 0.01f);
-		ImGui::DragFloat3("center", &obb.center.x, 0.01f);
-		ImGui::DragFloat3("orientations[0]", &obb.orientations[0].x, 0.01f);
-		ImGui::DragFloat3("orientations[1]", &obb.orientations[1].x, 0.01f);
-		ImGui::DragFloat3("orientations[2]", &obb.orientations[2].x, 0.01f);
-		ImGui::DragFloat3("size", &obb.size.x, 0.01f);
-		ImGui::End();
 
 		///
 		/// ↑描画処理ここまで

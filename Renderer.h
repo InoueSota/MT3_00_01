@@ -3,10 +3,8 @@
 #include "Vector3.h"
 #include "Input.h"
 
-class Renderer
+struct Renderer
 {
-public:
-
 	/// <summary>
 	/// 初期化関数
 	/// </summary>
@@ -26,6 +24,16 @@ public:
 	/// グリッド線描画
 	/// </summary>
 	void DrawGrid();
+
+	/// <summary>
+	/// スクリーン座標に変換した後に描画する
+	/// </summary>
+	void ScreenLine(const Vector3& start, const Vector3& end, uint32_t color);
+
+	/// <summary>
+	/// スクリーン座標に変換した後に描画する
+	/// </summary>
+	void ScreenTriangle(const Vector3 vertex[3], uint32_t color);
 
 	// ウィンドウサイズ
 	static const int kWindowWidth = 1280;

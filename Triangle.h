@@ -1,6 +1,6 @@
 #pragma once
 #include "Vector3.h"
-
+#include "Renderer.h"
 
 struct Triangle {
 
@@ -10,5 +10,5 @@ struct Triangle {
 	/// <summary>
 	/// 線分描画
 	/// </summary>
-	static void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+	static void DrawTriangle(Renderer& renderer, const Triangle& triangle, uint32_t color);
 };

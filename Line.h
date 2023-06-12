@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector3.h"
+#include "Renderer.h"
 
 struct Line {
 
@@ -36,7 +37,7 @@ struct Segment {
 	static Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 
 	/// <summary>
-	/// 線分描画
+	/// 最近接点を求める
 	/// </summary>
-	static void Draw(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
+	static void Draw(Renderer& renderer, const Segment& segment);
 };

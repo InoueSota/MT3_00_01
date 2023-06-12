@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector3.h"
+#include "Renderer.h"
 
 struct AABB {
 
@@ -18,5 +19,5 @@ struct AABB {
 	/// <summary>
 	/// AABB描画
 	/// </summary>
-	static void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
+	static void DrawAABB(Renderer& renderer, const AABB& aabb);
 };

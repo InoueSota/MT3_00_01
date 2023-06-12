@@ -2,8 +2,7 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include <Novice.h>
-
-
+#include "Renderer.h"
 
 class Sphere
 {
@@ -20,6 +19,6 @@ public:
 	/// <summary>
 	/// 球描画
 	/// </summary>
-	static void Draw(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
+	static void Draw(Renderer& renderer, const Sphere& sphere);
 };
 
