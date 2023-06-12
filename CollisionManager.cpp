@@ -1,7 +1,7 @@
 #include "CollisionManager.h"
 #include <algorithm>
 
-
+// 球
 bool IsCollision(const Sphere& s1, const Sphere& s2)
 {
     // 半径の合計よりも短ければ衝突
@@ -10,7 +10,6 @@ bool IsCollision(const Sphere& s1, const Sphere& s2)
     }
     return false;
 }
-
 bool IsCollision(const Sphere& sphere, const Plane& plane)
 {
     Vector3 normal = Vector3(plane.normal);
@@ -22,6 +21,7 @@ bool IsCollision(const Sphere& sphere, const Plane& plane)
     return false;
 }
 
+// 直線
 bool IsCollision(const Line& line, const Plane& plane)
 {
     // 平行だったらfalseを返す
@@ -31,7 +31,6 @@ bool IsCollision(const Line& line, const Plane& plane)
     }
     return true;
 }
-
 bool IsCollision(const Line& line, const Triangle& triangle)
 {
 	// 三角形の各頂点を結ぶベクトルを求める
@@ -71,7 +70,6 @@ bool IsCollision(const Line& line, const Triangle& triangle)
 	}
 	return false;
 }
-
 bool IsCollision(const Line& line, const AABB& aabb)
 {
 	if (line.diff.x == 0.0f || line.diff.y == 0.0f || line.diff.z == 0.0f) {
@@ -149,7 +147,23 @@ bool IsCollision(const Line& line, const AABB& aabb)
 	// 条件を抜けたら衝突
 	return true;
 }
+bool IsCollision(const Line& line, const OBB& obb)
+{
+	// OBBのWorldMatrixの逆行列を作成
+	Matrix4x4 worldMatrixInverse = OBB::MakeInverse(OBB::MakeRotationFromOrientations(obb.orientations), obb.center);
 
+	// ローカル座標を計算
+	Vector3 localOrigin = Vector3::Transform(line.origin, worldMatrixInverse);
+	Vector3 localEnd = Vector3::Transform(line.origin + line.diff, worldMatrixInverse);
+
+	// ローカル空間で衝突判定
+	AABB localAABB{ {-obb.size.x, -obb.size.y, -obb.size.z}, {obb.size.x, obb.size.y, obb.size.z} };
+	Segment localLine{ localOrigin, localEnd - localOrigin };
+
+	return IsCollision(localLine, localAABB);
+}
+
+// 半直線
 bool IsCollision(const Ray& ray, const Plane& plane)
 {
 	// 平行だったらfalseを返す
@@ -164,7 +178,6 @@ bool IsCollision(const Ray& ray, const Plane& plane)
 	}
 	return false;
 }
-
 bool IsCollision(const Ray& ray, const Triangle& triangle)
 {
 	// 三角形の各頂点を結ぶベクトルを求める
@@ -204,7 +217,6 @@ bool IsCollision(const Ray& ray, const Triangle& triangle)
 	}
 	return false;
 }
-
 bool IsCollision(const Ray& ray, const AABB& aabb)
 {
 	if (ray.diff.x == 0.0f || ray.diff.y == 0.0f || ray.diff.z == 0.0f) {
@@ -282,7 +294,23 @@ bool IsCollision(const Ray& ray, const AABB& aabb)
 	// 条件を抜けたら衝突
 	return true;
 }
+bool IsCollision(const Ray& ray, const OBB& obb)
+{
+	// OBBのWorldMatrixの逆行列を作成
+	Matrix4x4 worldMatrixInverse = OBB::MakeInverse(OBB::MakeRotationFromOrientations(obb.orientations), obb.center);
 
+	// ローカル座標を計算
+	Vector3 localOrigin = Vector3::Transform(ray.origin, worldMatrixInverse);
+	Vector3 localEnd = Vector3::Transform(ray.origin + ray.diff, worldMatrixInverse);
+
+	// ローカル空間で衝突判定
+	AABB localAABB{ {-obb.size.x, -obb.size.y, -obb.size.z}, {obb.size.x, obb.size.y, obb.size.z} };
+	Segment localRay{ localOrigin, localEnd - localOrigin };
+
+	return IsCollision(localRay, localAABB);
+}
+
+// 線分
 bool IsCollision(const Segment& segment, const Plane& plane)
 {
 	// 平行だったらfalseを返す
@@ -297,7 +325,6 @@ bool IsCollision(const Segment& segment, const Plane& plane)
 	}
 	return false;
 }
-
 bool IsCollision(const Segment& segment, const Triangle& triangle)
 {
 	// 三角形の各頂点を結ぶベクトルを求める
@@ -337,7 +364,6 @@ bool IsCollision(const Segment& segment, const Triangle& triangle)
 	}
 	return false;
 }
-
 bool IsCollision(const Segment& segment, const AABB& aabb)
 {
 	if (segment.diff.x == 0.0f || segment.diff.y == 0.0f || segment.diff.z == 0.0f) {
@@ -415,34 +441,23 @@ bool IsCollision(const Segment& segment, const AABB& aabb)
 	// 条件を抜けたら衝突
 	return true;
 }
-
 bool IsCollision(const Segment& segment, const OBB& obb)
 {
-	Matrix4x4 worldMatrix = {
-	obb.orientations[0].x, obb.orientations[0].y, obb.orientations[0].z, 0.0f,
-	obb.orientations[1].x, obb.orientations[1].y, obb.orientations[1].z, 0.0f,
-	obb.orientations[2].x, obb.orientations[2].y, obb.orientations[2].z, 0.0f,
-	obb.center.x, obb.center.y, obb.center.z, 1.0f
-	};
-
+	// OBBのWorldMatrixの逆行列を作成
 	Matrix4x4 worldMatrixInverse = OBB::MakeInverse(OBB::MakeRotationFromOrientations(obb.orientations), obb.center);
 
+	// ローカル座標を計算
 	Vector3 localOrigin = Vector3::Transform(segment.origin, worldMatrixInverse);
 	Vector3 localEnd = Vector3::Transform(segment.origin + segment.diff, worldMatrixInverse);
 
-	AABB localAABB{
-		{-obb.size.x, -obb.size.y, -obb.size.z},
-		{obb.size.x, obb.size.y, obb.size.z}
-	};
+	// ローカル空間で衝突判定
+	AABB localAABB{{-obb.size.x, -obb.size.y, -obb.size.z}, {obb.size.x, obb.size.y, obb.size.z}};
+	Segment localSegment{localOrigin, localEnd - localOrigin};
 
-	Segment localLine{
-		localOrigin,
-		localEnd - localOrigin
-	};
-
-	return IsCollision(localLine, localAABB);
+	return IsCollision(localSegment, localAABB);
 }
 
+// AABB
 bool IsCollision(const AABB& aabb1, const AABB& aabb2)
 {
 	if ((aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) &&
@@ -452,7 +467,6 @@ bool IsCollision(const AABB& aabb1, const AABB& aabb2)
 	}
 	return false;
 }
-
 bool IsCollision(const AABB& aabb, const Sphere& sphere)
 {
 	// 最近接点を求める
@@ -468,54 +482,19 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere)
 	return false;
 }
 
+// OBB
 bool IsCollision(const OBB& obb, const Sphere& sphere)
 {
-	Matrix4x4 worldMatrix = {
-		obb.orientations[0].x, obb.orientations[0].y, obb.orientations[0].z, 0.0f,
-		obb.orientations[1].x, obb.orientations[1].y, obb.orientations[1].z, 0.0f,
-		obb.orientations[2].x, obb.orientations[2].y, obb.orientations[2].z, 0.0f,
-		obb.center.x, obb.center.y, obb.center.z, 1.0f
-	};
-
+	// OBBのWorldMatrixの逆行列を作成
 	Matrix4x4 worldMatrixInverse = OBB::MakeInverse(OBB::MakeRotationFromOrientations(obb.orientations), obb.center);
 
+	// ローカル座標を計算
 	Vector3 centerInOBBLocalSpace = Vector3::Transform(sphere.center, worldMatrixInverse);
 
+	// ローカル空間で衝突判定
 	AABB aabbOBBLocal{ .min = -obb.size, .max = obb.size };
 	Sphere sphereOBBLocal{ centerInOBBLocalSpace, sphere.radius };
 
-	// ローカル平面で衝突判定
 	return IsCollision(aabbOBBLocal, sphereOBBLocal);
 }
 
-void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
-	const float kGridHalWidth = 2.0f;
-	const uint32_t kSubdivision = 10;
-	const float kGridEvery = (kGridHalWidth * 2.0f) / float(kSubdivision);
-
-	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
-		Vector3 worldStartPosition = { -kGridEvery * kSubdivision / 2.0f, 0.0f, kGridEvery * (xIndex - kSubdivision / 2.0f) };
-		Vector3 worldEndPosition = { kGridEvery * kSubdivision / 2.0f, 0.0f, kGridEvery * (xIndex - kSubdivision / 2.0f) };
-		Vector3 screenStartPosition = Vector3::Transform(Vector3::Transform(worldStartPosition, viewProjectionMatrix), viewportMatrix);
-		Vector3 screenEndPosition = Vector3::Transform(Vector3::Transform(worldEndPosition, viewProjectionMatrix), viewportMatrix);
-		if (xIndex == kSubdivision / 2) {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, BLACK);
-		}
-		else {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, 0xAAAAAAFF);
-		}
-	}
-
-	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
-		Vector3 worldStartPosition = { kGridEvery * (zIndex - kSubdivision / 2.0f), 0.0f, -kGridEvery * kSubdivision / 2.0f };
-		Vector3 worldEndPosition = { kGridEvery * (zIndex - kSubdivision / 2.0f), 0.0f, kGridEvery * kSubdivision / 2.0f };
-		Vector3 screenStartPosition = Vector3::Transform(Vector3::Transform(worldStartPosition, viewProjectionMatrix), viewportMatrix);
-		Vector3 screenEndPosition = Vector3::Transform(Vector3::Transform(worldEndPosition, viewProjectionMatrix), viewportMatrix);
-		if (zIndex == kSubdivision / 2) {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, BLACK);
-		}
-		else {
-			Novice::DrawLine((int)screenStartPosition.x, (int)screenStartPosition.y, (int)screenEndPosition.x, (int)screenEndPosition.y, 0xAAAAAAFF);
-		}
-	}
-}

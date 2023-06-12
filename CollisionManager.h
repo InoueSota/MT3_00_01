@@ -32,6 +32,11 @@ bool IsCollision(const Line& line, const Triangle& triangle);
 bool IsCollision(const Line& line, const AABB& aabb);
 
 /// <summary>
+/// 直線とOBBの当たり判定
+/// </summary>
+bool IsCollision(const Line& line, const OBB& obb);
+
+/// <summary>
 /// 半直線と平面の当たり判定
 /// </summary>
 bool IsCollision(const Ray& ray, const Plane& plane);
@@ -45,6 +50,11 @@ bool IsCollision(const Ray& ray, const Triangle& triangle);
 /// 半直線とAABBの当たり判定
 /// </summary>
 bool IsCollision(const Ray& ray, const AABB& aabb);
+
+/// <summary>
+/// 半直線とOBBの当たり判定
+/// </summary>
+bool IsCollision(const Ray& ray, const OBB& obb);
 
 /// <summary>
 /// 線分と平面の当たり判定
@@ -80,8 +90,3 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere);
 /// OBBと球の当たり判定
 /// </summary>
 bool IsCollision(const OBB& obb, const Sphere& sphere);
-
-/// <summary>
-/// グリッド線描画
-/// </summary>
-void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);

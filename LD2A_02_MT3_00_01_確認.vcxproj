@@ -114,6 +114,7 @@
     <ClCompile Include="Matrix4x4.cpp" />
     <ClCompile Include="OBB.cpp" />
     <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="Vector2.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="Matrix3x3.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="Plane.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Triangle.h" />
   </ItemGroup>
