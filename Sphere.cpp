@@ -4,7 +4,7 @@
 
 
 // 球描画
-void Sphere::DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
+void Sphere::Draw(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
 	const uint32_t kSubdivision = 16;
 	const float kLonEvery = (float)M_PI / ((float)kSubdivision / 2.0f);
 	const float kLatEvery = (float)M_PI / ((float)kSubdivision / 2.0f);

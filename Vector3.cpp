@@ -29,6 +29,7 @@ Vector3 Vector3::Subtract(const Vector3& v1, const Vector3& v2) {
 	};
 }
 Vector3 Vector3::operator-(const Vector3& other) const { return { x - other.x, y - other.y, z - other.z }; }
+Vector3 Vector3::operator-() const { return { -x, -y, -z }; }
 
 //スカラー倍
 Vector3 Vector3::Multiply(float scalar, const Vector3& v) {
@@ -38,7 +39,9 @@ Vector3 Vector3::Multiply(float scalar, const Vector3& v) {
 		scalar * v.z
 	};
 }
+Vector3 Vector3::operator*(const Vector3& vector) const { return { x * vector.x, y * vector.y, z * vector.z }; }
 Vector3 Vector3::operator*(float f) const { return { x * f, y * f, z * f }; }
+Vector3 Vector3::operator*(float f) { return { x * f, y * f, z * f }; }
 
 // 除算
 Vector3 Vector3::operator/(float f) const { return { x / f, y / f, z / f }; }
@@ -130,6 +133,43 @@ Vector3 Vector3::GetYaxis(const Matrix4x4& m)
 Vector3 Vector3::GetZaxis(const Matrix4x4& m)
 {
 	return { m.m[2][0], m.m[2][1], m.m[2][2] };
+}
+
+Vector3 Vector3::Lerp(const Vector3& v1, const Vector3& v2, float t)
+{
+	return v1 + (v2 - v1) * t;
+}
+float Vector3::Lerp(const float f1, const float f2, float t) 
+{
+	return f1 + (f2 - f1) * t;
+}
+
+Vector3 Vector3::Slerp(const Vector3& v1, const Vector3& v2, float t)
+{
+	float s = Lerp(Vector3::Length(v1), Vector3::Length(v2), t);
+	Vector3 nv1 = Vector3::Normalize(v1);
+	Vector3 nv2 = Vector3::Normalize(v2);
+	float theta = 1 / std::cos(Dot(nv1, nv2));
+
+	return ((nv1 * std::sin((1 - t) * theta) + nv2 * std::sin(t * theta)) / std::sin(theta)) * s;
+}
+
+Vector3 Vector3::CatmullRom(const std::vector<Vector3>& point, float t)
+{
+	//for (int i = 1; i < point.size() - 2; i++) {
+
+	//	Vector3 a4 = point[i];
+	//	Vector3 a3 = (point[i + 1] - point[i - 1]) / 2.0f;
+	//	Vector3 a2 = (point[i + 2] - point[i]) / 2.0f - a3 * 2.0f - a4 * 3.0f;
+	//	Vector3 a1 = point[i] * 3.0f - (point[i + 2] - point[i]) / 2.0f - a3 * 2.0f - a4 * 3.0f;
+
+	//	return a1 * t * t * t + a2 * t * t + a3 * t + a4;
+	//}
+
+	point;
+	t;
+
+	return Vector3();
 }
 
 //表示

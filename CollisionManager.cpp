@@ -441,6 +441,28 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere)
 	return false;
 }
 
+bool IsCollision(const OBB& obb, const Sphere& sphere)
+{
+	Matrix4x4 worldMatrix = {
+		obb.orientations[0].x, obb.orientations[0].y, obb.orientations[0].z, 0.0f,
+		obb.orientations[1].x, obb.orientations[1].y, obb.orientations[1].z, 0.0f,
+		obb.orientations[2].x, obb.orientations[2].y, obb.orientations[2].z, 0.0f,
+		obb.center.x, obb.center.y, obb.center.z, 1.0f
+	};
+
+	Matrix4x4 worldMatrixInverse = OBB::MakeInverse(OBB::MakeRotationFromOrientations(obb.orientations), obb.center);
+
+	Vector3 centerInOBBLocalSpace = Vector3::Transform(sphere.center, worldMatrixInverse);
+
+	AABB aabbOBBLocal{ .min = -obb.size, .max = obb.size };
+	Sphere sphereOBBLocal{ centerInOBBLocalSpace, sphere.radius };
+
+	// ローカル平面で衝突判定
+	bool isCollision = IsCollision(aabbOBBLocal, sphereOBBLocal);
+
+	return isCollision;
+}
+
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
 	const float kGridHalWidth = 2.0f;
 	const uint32_t kSubdivision = 10;

@@ -4,6 +4,7 @@
 #include "Triangle.h"
 #include "Line.h"
 #include "AABB.h"
+#include "OBB.h"
 
 /// <summary>
 /// 球同士当たり判定
@@ -69,6 +70,11 @@ bool IsCollision(const AABB& aabb1, const AABB& aabb2);
 /// AABBと球の当たり判定
 /// </summary>
 bool IsCollision(const AABB& aabb, const Sphere& sphere);
+
+/// <summary>
+/// OBBと球の当たり判定
+/// </summary>
+bool IsCollision(const OBB& obb, const Sphere& sphere);
 
 /// <summary>
 /// グリッド線描画
