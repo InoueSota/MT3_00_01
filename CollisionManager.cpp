@@ -416,6 +416,33 @@ bool IsCollision(const Segment& segment, const AABB& aabb)
 	return true;
 }
 
+bool IsCollision(const Segment& segment, const OBB& obb)
+{
+	Matrix4x4 worldMatrix = {
+	obb.orientations[0].x, obb.orientations[0].y, obb.orientations[0].z, 0.0f,
+	obb.orientations[1].x, obb.orientations[1].y, obb.orientations[1].z, 0.0f,
+	obb.orientations[2].x, obb.orientations[2].y, obb.orientations[2].z, 0.0f,
+	obb.center.x, obb.center.y, obb.center.z, 1.0f
+	};
+
+	Matrix4x4 worldMatrixInverse = OBB::MakeInverse(OBB::MakeRotationFromOrientations(obb.orientations), obb.center);
+
+	Vector3 localOrigin = Vector3::Transform(segment.origin, worldMatrixInverse);
+	Vector3 localEnd = Vector3::Transform(segment.origin + segment.diff, worldMatrixInverse);
+
+	AABB localAABB{
+		{-obb.size.x, -obb.size.y, -obb.size.z},
+		{obb.size.x, obb.size.y, obb.size.z}
+	};
+
+	Segment localLine{
+		localOrigin,
+		localEnd - localOrigin
+	};
+
+	return IsCollision(localLine, localAABB);
+}
+
 bool IsCollision(const AABB& aabb1, const AABB& aabb2)
 {
 	if ((aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) &&
@@ -458,9 +485,7 @@ bool IsCollision(const OBB& obb, const Sphere& sphere)
 	Sphere sphereOBBLocal{ centerInOBBLocalSpace, sphere.radius };
 
 	// ローカル平面で衝突判定
-	bool isCollision = IsCollision(aabbOBBLocal, sphereOBBLocal);
-
-	return isCollision;
+	return IsCollision(aabbOBBLocal, sphereOBBLocal);
 }
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {

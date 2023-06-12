@@ -6,9 +6,9 @@
 #include "Vector2.h"
 #include "CollisionManager.h"
 #include "AABB.h"
-#include "Sphere.h"
+#include "Line.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_08";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_09";
 const int kWindowWidth = 1280;
 const int kWindowHeight = 720;
 
@@ -45,9 +45,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.size{ 0.5f, 0.5f, 0.5f },
 		.color = WHITE
 	};
-	Sphere sphere{
-		.center{ 0.0f, 0.0f, 0.0f },
-		.radius{ 0.5f },
+	Segment segment{
+		.origin{-0.8f, -0.3f, 0.0f},
+		.diff{0.5f, 0.5f, 0.5f},
 		.color = WHITE
 	};
 
@@ -68,7 +68,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		OBB::MakeOrientations(obb, rotate);
 
 		// 当たり判定
-		if (IsCollision(obb, sphere)) {
+		if (IsCollision(segment, obb)) {
 			obb.color = RED;
 		} else {
 			obb.color = WHITE;
@@ -106,7 +106,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(worldViewProjectionMatrix, viewportMatrix);
 		OBB::Draw(obb, worldViewProjectionMatrix, viewportMatrix);
-		Sphere::Draw(sphere, worldViewProjectionMatrix, viewportMatrix);
+		Segment::Draw(segment, worldViewProjectionMatrix, viewportMatrix);
 
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("rotate", &rotate.x, 0.01f);

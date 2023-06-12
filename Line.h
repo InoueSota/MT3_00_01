@@ -38,5 +38,5 @@ struct Segment {
 	/// <summary>
 	/// 線分描画
 	/// </summary>
-	static void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
+	static void Draw(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 };

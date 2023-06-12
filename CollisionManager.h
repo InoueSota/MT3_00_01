@@ -62,6 +62,11 @@ bool IsCollision(const Segment& segment, const Triangle& triangle);
 bool IsCollision(const Segment& segment, const AABB& aabb);
 
 /// <summary>
+/// 線分とOBBの当たり判定
+/// </summary>
+bool IsCollision(const Segment& segment, const OBB& obb);
+
+/// <summary>
 /// AABB同士の当たり判定
 /// </summary>
 bool IsCollision(const AABB& aabb1, const AABB& aabb2);
