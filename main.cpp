@@ -6,7 +6,7 @@
 #include "CollisionManager.h"
 #include "OBB.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_09";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_10";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
