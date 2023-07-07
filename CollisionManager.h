@@ -90,3 +90,8 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere);
 /// OBBと球の当たり判定
 /// </summary>
 bool IsCollision(const OBB& obb, const Sphere& sphere);
+
+/// <summary>
+/// OBBとOBBの当たり判定
+/// </summary>
+bool IsCollision(const OBB& obb1, const OBB& obb2);

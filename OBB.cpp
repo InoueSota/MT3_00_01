@@ -34,6 +34,33 @@ Matrix4x4 OBB::MakeInverse(const Matrix4x4& rotation, const Vector3& translate)
     return transposeRotation;
 }
 
+void OBB::MakeVertex(Vector3 base[8], const OBB& obb)
+{
+    Vector3 vertices[] = {
+        { -obb.size.x,  obb.size.y, -obb.size.z },
+        {  obb.size.x,  obb.size.y, -obb.size.z },
+        {  obb.size.x, -obb.size.y, -obb.size.z },
+        -obb.size,
+
+        { -obb.size.x,  obb.size.y, obb.size.z },
+        obb.size,
+        {  obb.size.x, -obb.size.y, obb.size.z },
+        { -obb.size.x, -obb.size.y, obb.size.z }
+    };
+
+    Matrix4x4 tmpMatrix = {
+        obb.orientations[0].x, obb.orientations[0].y, obb.orientations[0].z, 0.0f,
+        obb.orientations[1].x, obb.orientations[1].y, obb.orientations[1].z, 0.0f,
+        obb.orientations[2].x, obb.orientations[2].y, obb.orientations[2].z, 0.0f,
+        obb.center.x, obb.center.y, obb.center.z, 1.0f
+    };
+
+    for (uint32_t i = 0; i < 8; i++)
+    {
+        base[i] = Vector3::Transform(vertices[i], tmpMatrix);
+    }
+}
+
 void OBB::Draw(Renderer& renderer, const OBB& obb)
 {
     Vector3 vertices[] = {

@@ -10,6 +10,11 @@ struct Line {
 	Vector3 diff;
 	// 色
 	uint32_t color;
+
+	/// <summary>
+	/// 最近接点を求める
+	/// </summary>
+	static Vector3 ClosestPoint(const Vector3& point, const Line& line);
 };
 
 struct Ray {

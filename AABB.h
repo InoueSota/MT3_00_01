@@ -19,5 +19,5 @@ struct AABB {
 	/// <summary>
 	/// AABB描画
 	/// </summary>
-	static void DrawAABB(Renderer& renderer, const AABB& aabb);
+	static void Draw(Renderer& renderer, const AABB& aabb);
 };

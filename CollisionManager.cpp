@@ -497,4 +497,110 @@ bool IsCollision(const OBB& obb, const Sphere& sphere)
 
 	return IsCollision(aabbOBBLocal, sphereOBBLocal);
 }
+bool IsCollision(const OBB& obb1, const OBB& obb2)
+{
+	// 面法線
+	Vector3 planeNormal[6] = {
+		obb1.orientations[0] - obb1.center,
+		obb1.orientations[1] - obb1.center,
+		obb1.orientations[2] - obb1.center,
+		obb2.orientations[0] - obb2.center,
+		obb2.orientations[1] - obb2.center,
+		obb2.orientations[2] - obb2.center
+	};
+
+	Vector3 obb1RotateVertex[8];
+	Vector3 obb2RotateVertex[8];
+	obb1.MakeVertex(obb1RotateVertex, obb1);
+	obb2.MakeVertex(obb2RotateVertex, obb2);
+
+	for (uint32_t i = 0; i < 6; i++)
+	{
+		float min1 = 0.0f, min2 = 0.0f;
+		float max1 = 0.0f, max2 = 0.0f;
+		float dot1[8];
+		float dot2[8];
+
+		for (uint32_t j = 0; j < 8; j++)
+		{
+			dot1[j] = Vector3::Dot(planeNormal[i], obb1RotateVertex[j]);
+			dot2[j] = Vector3::Dot(planeNormal[i], obb2RotateVertex[j]);
+			if (j == 0) {
+				min1 = dot1[j];
+				min2 = dot2[j];
+				max1 = dot1[j];
+				max2 = dot2[j];
+			}
+			else
+			{
+				min1 = (std::min)(dot1[j], min1);
+				min2 = (std::min)(dot2[j], min2);
+				max1 = (std::max)(dot1[j], max1);
+				max2 = (std::max)(dot2[j], max2);
+			}
+		}
+
+		float L1 = max1 - min1;
+		float L2 = max2 - min2;
+
+		float sumSpan = std::fabs(L1) + std::fabs(L2);
+		float longSpan = (std::max)(max1, max2) - (std::min)(min1, min2);
+
+		if (sumSpan < longSpan) {
+			return false;
+		}
+	}
+
+	// 各辺の組み合わせのクロス積
+	Vector3 cross[9] = {
+		Vector3::Cross(obb1.orientations[0], obb2.orientations[0]),
+		Vector3::Cross(obb1.orientations[0], obb2.orientations[1]),
+		Vector3::Cross(obb1.orientations[0], obb2.orientations[2]),
+		Vector3::Cross(obb1.orientations[1], obb2.orientations[0]),
+		Vector3::Cross(obb1.orientations[1], obb2.orientations[1]),
+		Vector3::Cross(obb1.orientations[1], obb2.orientations[2]),
+		Vector3::Cross(obb1.orientations[2], obb2.orientations[0]),
+		Vector3::Cross(obb1.orientations[2], obb2.orientations[1]),
+		Vector3::Cross(obb1.orientations[2], obb2.orientations[2])
+	};
+
+	for (uint32_t i = 0; i < 9; i++)
+	{
+		float min1 = 0.0f, min2 = 0.0f;
+		float max1 = 0.0f, max2 = 0.0f;
+		float dot1[8];
+		float dot2[8];
+
+		for (uint32_t j = 0; j < 8; j++)
+		{
+			dot1[j] = Vector3::Dot(cross[i], obb1RotateVertex[j]);
+			dot2[j] = Vector3::Dot(cross[i], obb2RotateVertex[j]);
+			if (j == 0) {
+				min1 = dot1[j];
+				min2 = dot2[j];
+				max1 = dot1[j];
+				max2 = dot2[j];
+			}
+			else
+			{
+				min1 = (std::min)(dot1[j], min1);
+				min2 = (std::min)(dot2[j], min2);
+				max1 = (std::max)(dot1[j], max1);
+				max2 = (std::max)(dot2[j], max2);
+			}
+		}
+
+		float L1 = max1 - min1;
+		float L2 = max2 - min2;
+
+		float sumSpan = L1 + L2;
+		float longSpan = (std::max)(max1, max2) - (std::min)(min1, min2);
+
+		if (sumSpan < longSpan) {
+			return false;
+		}
+	}
+
+	return true;
+}
 

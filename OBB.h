@@ -29,6 +29,11 @@ struct OBB
 	static Matrix4x4 MakeInverse(const Matrix4x4& rotation, const Vector3& translate);
 
 	/// <summary>
+	/// OBBの各頂点を作る
+	/// </summary>
+	static void MakeVertex(Vector3 base[8], const OBB& obb);
+
+	/// <summary>
 	/// OBB描画
 	/// </summary>
 	static void Draw(Renderer& renderer, const OBB& obb);

@@ -13,7 +13,7 @@ void AABB::SafeParameter(AABB& aabb)
     aabb.max.z = (std::max)(aabb.min.z, aabb.max.z);
 }
 
-void AABB::DrawAABB(Renderer& renderer, const AABB& aabb)
+void AABB::Draw(Renderer& renderer, const AABB& aabb)
 {
     Vector3 vertices[] = {
             { aabb.min.x,  aabb.max.y, aabb.min.z },
