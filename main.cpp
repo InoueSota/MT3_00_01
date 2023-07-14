@@ -21,27 +21,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	renderer.Initialize();
 
 	// 初期化
-	Vector3 controlPoints[4] = {
-		{-0.8f, 0.58f, 1.0f },
-		{1.76f, 1.0f, -0.3f },
-		{0.94f, -0.7f, 2.3f },
-		{-0.53f, -0.26f, -0.15f }
+	Vector3 translates[3] = {
+		{0.2f, 1.0f, 0.0f},
+		{0.4f, 0.0f, 0.0f},
+		{0.3f, 0.0f, 0.0f}
 	};
-	Sphere sphere1 = {
-		.radius = 0.01f,
-		.color = BLACK
+	Vector3 rotates[3] = {
+		{0.0f, 0.0f, -6.8f},
+		{0.0f, 0.0f, -1.4f},
+		{0.0f, 0.0f,  0.0f}
 	};
-	Sphere sphere2 = {
-		.radius = 0.01f,
-		.color = BLACK
+	Vector3 scales[3] = {
+		{1.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f}
 	};
-	Sphere sphere3 = {
-		.radius = 0.01f,
-		.color = BLACK
+
+	Sphere shoulderSphere = {
+		.radius = 0.05f,
+		.color = RED
 	};
-	Sphere sphere4 = {
-		.radius = 0.01f,
-		.color = BLACK
+	Sphere elbowSphere = {
+		.radius = 0.05f,
+		.color = GREEN
+	};
+	Sphere handSphere = {
+		.radius = 0.05f,
+		.color = BLUE
 	};
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -57,11 +63,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		renderer.Update();
-		sphere1.center = controlPoints[0];
-		sphere2.center = controlPoints[1];
-		sphere3.center = controlPoints[2];
-		sphere4.center = controlPoints[3];
+		renderer.Update(scales, rotates, translates);
 
 		///
 		/// ↑更新処理ここまで
@@ -72,17 +74,29 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		renderer.Draw();
-		Vector3::DrawCatmullRom(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3], renderer, BLUE);
-		Sphere::Draw(renderer, sphere1);
-		Sphere::Draw(renderer, sphere2);
-		Sphere::Draw(renderer, sphere3);
-		Sphere::Draw(renderer, sphere4);
+
+		Vector3 screenShoulder = Vector3::Transform(shoulderSphere.center, renderer.shoulderWorldViewProjectionMatrix * renderer.viewportMatrix);
+		Vector3 screenElbow = Vector3::Transform(elbowSphere.center, renderer.elbowWorldViewProjectionMatrix * renderer.viewportMatrix);
+		Vector3 screenHand = Vector3::Transform(handSphere.center, renderer.handWorldViewProjectionMatrix * renderer.viewportMatrix);
+
+		// 描画する
+		Novice::DrawLine(static_cast<int>(screenShoulder.x), static_cast<int>(screenShoulder.y), static_cast<int>(screenElbow.x), static_cast<int>(screenElbow.y), WHITE);
+		Novice::DrawLine(static_cast<int>(screenElbow.x), static_cast<int>(screenElbow.y), static_cast<int>(screenHand.x), static_cast<int>(screenHand.y), WHITE);
+
+		Sphere::Draw(renderer.shoulderWorldViewProjectionMatrix, renderer.viewportMatrix, shoulderSphere);
+		Sphere::Draw(renderer.elbowWorldViewProjectionMatrix, renderer.viewportMatrix, elbowSphere);
+		Sphere::Draw(renderer.handWorldViewProjectionMatrix, renderer.viewportMatrix, handSphere);
 
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("controlPoints[0]", &controlPoints[0].x, 0.01f);
-		ImGui::DragFloat3("controlPoints[1]", &controlPoints[1].x, 0.01f);
-		ImGui::DragFloat3("controlPoints[2]", &controlPoints[2].x, 0.01f);
-		ImGui::DragFloat3("controlPoints[3]", &controlPoints[3].x, 0.01f);
+		ImGui::DragFloat3("translates[0]", &translates[0].x, 0.01f);
+		ImGui::DragFloat3("rotates[0]", &rotates[0].x, 0.01f);
+		ImGui::DragFloat3("scales[0]", &scales[0].x, 0.01f);
+		ImGui::DragFloat3("translates[1]", &translates[1].x, 0.01f);
+		ImGui::DragFloat3("rotates[1]", &rotates[1].x, 0.01f);
+		ImGui::DragFloat3("scales[1]", &scales[1].x, 0.01f);
+		ImGui::DragFloat3("translates[2]", &translates[2].x, 0.01f);
+		ImGui::DragFloat3("rotates[2]", &rotates[2].x, 0.01f);
+		ImGui::DragFloat3("scales[2]", &scales[2].x, 0.01f);
 		ImGui::End();
 
 		///

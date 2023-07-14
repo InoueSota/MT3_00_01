@@ -33,6 +33,43 @@ void Renderer::Update()
 	}
 }
 
+void Renderer::Update(const Vector3 scales[3], const Vector3 rotates[3], const Vector3 translates[3])
+{
+	worldMatrix = Matrix4x4::MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, { 0.0f,0.0f,0.0f }, translate);
+	cameraMatrix = Matrix4x4::MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
+	viewMatrix = Matrix4x4::Inverse(cameraMatrix);
+	projectionMatrix = Matrix4x4::MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
+	worldViewProjectionMatrix = Matrix4x4::Multiply(worldMatrix, Matrix4x4::Multiply(viewMatrix, projectionMatrix));
+	viewportMatrix = Matrix4x4::MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
+
+	// 肩
+	shoulderWorldMatrix = Matrix4x4::MakeAffineMatrix(scales[0], rotates[0], translates[0]);
+	shoulderWorldViewProjectionMatrix = Matrix4x4::Multiply(shoulderWorldMatrix, Matrix4x4::Multiply(viewMatrix, projectionMatrix));
+
+	// 肘
+	elbowWorldMatrix = Matrix4x4::MakeAffineMatrix(scales[1], rotates[1], translates[1]) * shoulderWorldMatrix;
+	elbowWorldViewProjectionMatrix = Matrix4x4::Multiply(elbowWorldMatrix, Matrix4x4::Multiply(viewMatrix, projectionMatrix));
+
+	// 手
+	handWorldMatrix = Matrix4x4::MakeAffineMatrix(scales[2], rotates[2], translates[2]) * elbowWorldMatrix;
+	handWorldViewProjectionMatrix = Matrix4x4::Multiply(handWorldMatrix, Matrix4x4::Multiply(viewMatrix, projectionMatrix));
+
+
+	// カメラ移動
+	if (Novice::IsPressMouse(CENTER)) {
+		cameraTranslate += Vector3::Transform({ -static_cast<float>(input->GetMouseMove().lX), static_cast<float>(input->GetMouseMove().lY), 0.0f }, Matrix4x4::Inverse(viewMatrix)) * 0.001f;
+	}
+	// ドリーイン、ドリーアウト
+	else {
+		cameraTranslate += Vector3::GetZaxis(Matrix4x4::MakeRotateMatrix(cameraRotate)) * static_cast<float>(input->GetWheel()) * 0.002f;
+	}
+	// カメラ回転
+	if (Novice::IsPressMouse(RIGHT)) {
+		cameraRotate.x += static_cast<float>(input->GetMouseMove().lY) * 0.001f;
+		cameraRotate.y += static_cast<float>(input->GetMouseMove().lX) * 0.001f;
+	}
+}
+
 void Renderer::Draw()
 {
 	DrawGrid();

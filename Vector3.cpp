@@ -161,7 +161,7 @@ void Vector3::DrawBezier(const Vector3& controlPoint0, const Vector3& controlPoi
 	const int separateCount = 50;
 	std::vector<Vector3> drawPoints;
 
-	for (int i = 0; i < separateCount; i++)
+	for (int i = 0; i <= separateCount; i++)
 	{
 		float t = static_cast<float>(i) / static_cast<float>(separateCount);
 
@@ -197,7 +197,7 @@ void Vector3::DrawCatmullRom(const Vector3& controlPoint0, const Vector3& contro
 
 		for (int i = 0; i < 3; i++)
 		{
-			for (int j = 0; j < separateCount; j++) {
+			for (int j = 0; j <= separateCount; j++) {
 
 				float t = static_cast<float>(j) / static_cast<float>(separateCount);
 				Vector3 pos;

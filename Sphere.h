@@ -20,5 +20,6 @@ public:
 	/// 球描画
 	/// </summary>
 	static void Draw(Renderer& renderer, const Sphere& sphere);
+	static void Draw(const Matrix4x4& worldViewProjectionMatrix, const Matrix4x4& viewPortMatrix, const Sphere& sphere);
 };
 

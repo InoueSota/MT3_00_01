@@ -16,6 +16,11 @@ struct Renderer
 	void Update();
 
 	/// <summary>
+	/// 階層構造専用更新関数
+	/// </summary>
+	void Update(const Vector3 scales[3], const Vector3 rotates[3], const Vector3 translates[3]);
+
+	/// <summary>
 	/// 描画関数
 	/// </summary>
 	void Draw();
@@ -61,5 +66,13 @@ struct Renderer
 		CENTER
 	};
 	Input* input = nullptr;
+
+	// 階層構造専用
+	Matrix4x4 shoulderWorldMatrix;
+	Matrix4x4 shoulderWorldViewProjectionMatrix;
+	Matrix4x4 elbowWorldMatrix;
+	Matrix4x4 elbowWorldViewProjectionMatrix;
+	Matrix4x4 handWorldMatrix;
+	Matrix4x4 handWorldViewProjectionMatrix;
 };
 
