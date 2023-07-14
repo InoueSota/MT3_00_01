@@ -1,10 +1,20 @@
 #include "Vector3.h"
 #include <Novice.h>
 #include "Matrix4x4.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include "Renderer.h"
 
 
 
-//加算
+bool operator==(const Vector3& vec1, const Vector3& vec2) {
+	if (vec1.x != vec2.x || vec1.y != vec2.y || vec1.z != vec2.z) {
+		return false;
+	}
+	return true;
+}
+
+// 加算
 Vector3 Vector3::Add(const Vector3& v1, const Vector3& v2) {
 	return {
 		v1.x + v2.x,
@@ -12,13 +22,13 @@ Vector3 Vector3::Add(const Vector3& v1, const Vector3& v2) {
 		v1.z + v2.z
 	};
 }
-Vector3 Vector3::operator+=(const Vector3& other) {
-	x += other.x;
-	y += other.y;
-	z += other.z;
-	return *this;
+Vector3& operator+=(Vector3& vec1, const Vector3& vec2) {
+	vec1.x += vec2.x;
+	vec1.y += vec2.y;
+	vec1.z += vec2.z;
+	return vec1;
 }
-Vector3 Vector3::operator+(const Vector3& other) const { return { x + other.x, y + other.y, z + other.z }; }
+Vector3 operator+(const Vector3& vec1, const Vector3& vec2) { return { vec1.x + vec2.x, vec1.y + vec2.y, vec1.z + vec2.z }; }
 
 //減算
 Vector3 Vector3::Subtract(const Vector3& v1, const Vector3& v2) {
@@ -28,8 +38,8 @@ Vector3 Vector3::Subtract(const Vector3& v1, const Vector3& v2) {
 		v1.z - v2.z
 	};
 }
-Vector3 Vector3::operator-(const Vector3& other) const { return { x - other.x, y - other.y, z - other.z }; }
-Vector3 Vector3::operator-() const { return { -x, -y, -z }; }
+Vector3 operator-(const Vector3& vec1, const Vector3& vec2) { return { vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z }; }
+Vector3 operator-(const Vector3& vec) { return { -vec.x, -vec.y, -vec.z }; }
 
 //スカラー倍
 Vector3 Vector3::Multiply(float scalar, const Vector3& v) {
@@ -39,13 +49,15 @@ Vector3 Vector3::Multiply(float scalar, const Vector3& v) {
 		scalar * v.z
 	};
 }
-Vector3 Vector3::operator*(const Vector3& vector) const { return { x * vector.x, y * vector.y, z * vector.z }; }
-Vector3 Vector3::operator*(float f) const { return { x * f, y * f, z * f }; }
-Vector3 Vector3::operator*(float f) { return { x * f, y * f, z * f }; }
+Vector3 operator*(const Vector3& vec1, const Vector3& vec2) { return { vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z }; }
+Vector3 operator*(const Vector3& vec, float scalar) { return { vec.x * scalar, vec.y * scalar, vec.z * scalar }; }
+Vector3 operator*(int scalar, const Vector3& vec) { return { vec.x * scalar, vec.y * scalar, vec.z * scalar }; }
 
 // 除算
-Vector3 Vector3::operator/(float f) const { return { x / f, y / f, z / f }; }
-
+Vector3 operator/(const Vector3& vec, float scalar) {
+	float reciprocal = 1.0f / scalar;
+	return { vec.x * reciprocal, vec.y * reciprocal, vec.z * reciprocal };
+}
 //内積
 float Vector3::Dot(const Vector3& v1, const Vector3& v2) {
 	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
@@ -144,6 +156,26 @@ float Vector3::Lerp(const float f1, const float f2, float t)
 	return f1 + (f2 - f1) * t;
 }
 
+void Vector3::DrawBezier(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2, Renderer& renderer, uint32_t color)
+{
+	size_t separateCount = 50;
+	std::vector<Vector3> drawPoints;
+
+	for (size_t i = 0; i < separateCount; i++)
+	{
+		float t = static_cast<float>(i) / static_cast<float>(separateCount);
+
+		Vector3 p0p1 = Lerp(controlPoint0, controlPoint1, t);
+		Vector3 p1p2 = Lerp(controlPoint1, controlPoint2, t);
+		Vector3 p = Lerp(p0p1, p1p2, t);
+		drawPoints.push_back(p);
+
+		if (i > 0) {
+			renderer.ScreenLine(drawPoints[i - 1], drawPoints[i], color);
+		}
+	}
+}
+
 Vector3 Vector3::Slerp(const Vector3& v1, const Vector3& v2, float t)
 {
 	float s = Lerp(Vector3::Length(v1), Vector3::Length(v2), t);
@@ -154,22 +186,9 @@ Vector3 Vector3::Slerp(const Vector3& v1, const Vector3& v2, float t)
 	return ((nv1 * std::sin((1 - t) * theta) + nv2 * std::sin(t * theta)) / std::sin(theta)) * s;
 }
 
-Vector3 Vector3::CatmullRom(const std::vector<Vector3>& point, float t)
+Vector3 Vector3::CatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t)
 {
-	//for (int i = 1; i < point.size() - 2; i++) {
-
-	//	Vector3 a4 = point[i];
-	//	Vector3 a3 = (point[i + 1] - point[i - 1]) / 2.0f;
-	//	Vector3 a2 = (point[i + 2] - point[i]) / 2.0f - a3 * 2.0f - a4 * 3.0f;
-	//	Vector3 a1 = point[i] * 3.0f - (point[i + 2] - point[i]) / 2.0f - a3 * 2.0f - a4 * 3.0f;
-
-	//	return a1 * t * t * t + a2 * t * t + a3 * t + a4;
-	//}
-
-	point;
-	t;
-
-	return Vector3();
+	return ((-p0 + (3 * p1) - (3 * p2) + p3) * (t * t * t) + ((2 * p0) - (5 * p1) + (4 * p2) - p3) * (t * t) + (-p0 + p2) * t + (2 * p1)) / 2.0f;
 }
 
 //表示

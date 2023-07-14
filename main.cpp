@@ -3,10 +3,9 @@
 #include "Renderer.h"
 #include "Matrix4x4.h"
 #include "Vector3.h"
-#include "CollisionManager.h"
-#include "OBB.h"
+#include "Sphere.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_02_10";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_03_00";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -22,19 +21,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	renderer.Initialize();
 
 	// 初期化
-	Vector3 rotate1{ 0.0f, 0.0f, 0.0f };
-	Vector3 rotate2{ 0.05f, -2.49f, 0.15f };
-	OBB obb1{
-		.center{0.0f, 0.0f, 0.0f},
-		.orientations = { {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f} },
-		.size{0.83f, 0.26f, 0.24f},
-		.color = WHITE
+	Vector3 controlPoints[3] = {
+		{-0.8f, 0.58f, 1.0f },
+		{1.76f, 1.0f, -0.3f },
+		{0.94f, -0.7f, 2.3f }
 	};
-	OBB obb2{
-		.center{0.0f, 0.66f, 0.78f},
-		.orientations = { {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f} },
-		.size{0.5f, 0.37f, 0.5f},
-		.color = WHITE
+	Sphere sphere1 = {
+		.radius = 0.01f,
+		.color = BLACK
+	};
+	Sphere sphere2 = {
+		.radius = 0.01f,
+		.color = BLACK
+	};
+	Sphere sphere3 = {
+		.radius = 0.01f,
+		.color = BLACK
 	};
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -51,16 +53,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		renderer.Update();
-
-		obb1.MakeOrientations(obb1, rotate1);
-		obb2.MakeOrientations(obb2, rotate2);
-		if (IsCollision(obb1, obb2)) {
-			obb1.color = RED;
-		}
-		else
-		{
-			obb1.color = WHITE;
-		}
+		sphere1.center = controlPoints[0];
+		sphere2.center = controlPoints[1];
+		sphere3.center = controlPoints[2];
 
 		///
 		/// ↑更新処理ここまで
@@ -70,21 +65,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		obb1.Draw(renderer, obb1);
-		obb2.Draw(renderer, obb2);
 		renderer.Draw();
+		Vector3::DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], renderer, BLUE);
+		Sphere::Draw(renderer, sphere1);
+		Sphere::Draw(renderer, sphere2);
+		Sphere::Draw(renderer, sphere3);
 
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("1.center", &obb1.center.x, 0.01f);
-		ImGui::DragFloat3("1.orientations[0]", &obb1.orientations[0].x, 0.01f);
-		ImGui::DragFloat3("1.orientations[1]", &obb1.orientations[1].x, 0.01f);
-		ImGui::DragFloat3("1.orientations[2]", &obb1.orientations[2].x, 0.01f);
-		ImGui::DragFloat3("1.size", &obb1.size.x, 0.01f);
-		ImGui::DragFloat3("2.center", &obb2.center.x, 0.01f);
-		ImGui::DragFloat3("2.orientations[0]", &obb2.orientations[0].x, 0.01f);
-		ImGui::DragFloat3("2.orientations[1]", &obb2.orientations[1].x, 0.01f);
-		ImGui::DragFloat3("2.orientations[2]", &obb2.orientations[2].x, 0.01f);
-		ImGui::DragFloat3("2.size", &obb2.size.x, 0.01f);
+		ImGui::DragFloat3("controlPoints[0]", &controlPoints[0].x, 0.01f);
+		ImGui::DragFloat3("controlPoints[1]", &controlPoints[1].x, 0.01f);
+		ImGui::DragFloat3("controlPoints[2]", &controlPoints[2].x, 0.01f);
 		ImGui::End();
 
 		///
