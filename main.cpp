@@ -21,10 +21,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	renderer.Initialize();
 
 	// 初期化
-	Vector3 controlPoints[3] = {
+	Vector3 controlPoints[4] = {
 		{-0.8f, 0.58f, 1.0f },
 		{1.76f, 1.0f, -0.3f },
-		{0.94f, -0.7f, 2.3f }
+		{0.94f, -0.7f, 2.3f },
+		{-0.53f, -0.26f, -0.15f }
 	};
 	Sphere sphere1 = {
 		.radius = 0.01f,
@@ -35,6 +36,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.color = BLACK
 	};
 	Sphere sphere3 = {
+		.radius = 0.01f,
+		.color = BLACK
+	};
+	Sphere sphere4 = {
 		.radius = 0.01f,
 		.color = BLACK
 	};
@@ -56,6 +61,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		sphere1.center = controlPoints[0];
 		sphere2.center = controlPoints[1];
 		sphere3.center = controlPoints[2];
+		sphere4.center = controlPoints[3];
 
 		///
 		/// ↑更新処理ここまで
@@ -66,15 +72,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		renderer.Draw();
-		Vector3::DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], renderer, BLUE);
+		Vector3::DrawCatmullRom(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3], renderer, BLUE);
 		Sphere::Draw(renderer, sphere1);
 		Sphere::Draw(renderer, sphere2);
 		Sphere::Draw(renderer, sphere3);
+		Sphere::Draw(renderer, sphere4);
 
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("controlPoints[0]", &controlPoints[0].x, 0.01f);
 		ImGui::DragFloat3("controlPoints[1]", &controlPoints[1].x, 0.01f);
 		ImGui::DragFloat3("controlPoints[2]", &controlPoints[2].x, 0.01f);
+		ImGui::DragFloat3("controlPoints[3]", &controlPoints[3].x, 0.01f);
 		ImGui::End();
 
 		///

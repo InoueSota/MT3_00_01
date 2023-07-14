@@ -158,10 +158,10 @@ float Vector3::Lerp(const float f1, const float f2, float t)
 
 void Vector3::DrawBezier(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2, Renderer& renderer, uint32_t color)
 {
-	size_t separateCount = 50;
+	const int separateCount = 50;
 	std::vector<Vector3> drawPoints;
 
-	for (size_t i = 0; i < separateCount; i++)
+	for (int i = 0; i < separateCount; i++)
 	{
 		float t = static_cast<float>(i) / static_cast<float>(separateCount);
 
@@ -189,6 +189,39 @@ Vector3 Vector3::Slerp(const Vector3& v1, const Vector3& v2, float t)
 Vector3 Vector3::CatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t)
 {
 	return ((-p0 + (3 * p1) - (3 * p2) + p3) * (t * t * t) + ((2 * p0) - (5 * p1) + (4 * p2) - p3) * (t * t) + (-p0 + p2) * t + (2 * p1)) / 2.0f;
+}
+void Vector3::DrawCatmullRom(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2, const Vector3& controlPoint3, Renderer& renderer, uint32_t color) 
+{
+		const int separateCount = 50;
+		std::vector<Vector3> drawPoints;
+
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < separateCount; j++) {
+
+				float t = static_cast<float>(j) / static_cast<float>(separateCount);
+				Vector3 pos;
+
+				if (i == 0) {
+					pos = Vector3::CatmullRom(controlPoint0, controlPoint0, controlPoint1, controlPoint2, t);
+				}
+				else if (i == 1) {
+					pos = Vector3::CatmullRom(controlPoint0, controlPoint1, controlPoint2, controlPoint3, t);
+				}
+				else if (i == 2) {
+					pos = Vector3::CatmullRom(controlPoint1, controlPoint2, controlPoint3, controlPoint3, t);
+				}
+				drawPoints.push_back(pos);
+
+			}
+		}
+
+		for (int i = 1; i < drawPoints.size(); i++)
+		{
+			renderer.ScreenLine(drawPoints[i - 1], drawPoints[i], color);
+		}
+
+
 }
 
 //表示
