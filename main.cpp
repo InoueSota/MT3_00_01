@@ -8,7 +8,7 @@
 #include "Sphere.h"
 #include "Line.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_00";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_00_2";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -26,17 +26,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 初期化
 	float deltaTime = 1.0f / 60.0f;
 	Spring spring = {
-		.anchor = {0.0f, 0.0f, 0.0f},
-		.naturalLength = 1.0f,
+		.anchor = {0.0f, 1.0f, 0.0f},
+		.naturalLength = 0.7f,
 		.stiffness = 100.0f,
 		.dampingCoefficient = 2.0f
 	};
 	Ball ball = {
-		.position = {1.2f, 0.0f, 0.0f},
+		.position = {0.8f, 0.2f, 0.0f},
 		.mass = 2.0f,
 		.radius = 0.05f,
 		.color = BLUE
 	};
+	const Vector3 kGravity{ 0.0f, -9.8f, 0.0f };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -67,6 +68,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ball.velocity += ball.acceleration * deltaTime;
 		ball.position += ball.velocity * deltaTime;
+		ball.position += kGravity * deltaTime;
 
 		///
 		/// ↑更新処理ここまで
