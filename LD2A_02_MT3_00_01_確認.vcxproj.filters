@@ -71,6 +71,12 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Spring.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Ball.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -150,5 +156,7 @@
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Spring.h" />
+    <ClInclude Include="Ball.h" />
   </ItemGroup>
 </Project>

@@ -51,7 +51,7 @@ Vector3 Vector3::Multiply(float scalar, const Vector3& v) {
 }
 Vector3 operator*(const Vector3& vec1, const Vector3& vec2) { return { vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z }; }
 Vector3 operator*(const Vector3& vec, float scalar) { return { vec.x * scalar, vec.y * scalar, vec.z * scalar }; }
-Vector3 operator*(int scalar, const Vector3& vec) { return { vec.x * scalar, vec.y * scalar, vec.z * scalar }; }
+Vector3 operator*(float scalar, const Vector3& vec) { return { vec.x * scalar, vec.y * scalar, vec.z * scalar }; }
 
 // 除算
 Vector3 operator/(const Vector3& vec, float scalar) {
