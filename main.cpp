@@ -5,7 +5,7 @@
 #include "Vector3.h"
 #include "Sphere.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_03_00";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_03_02";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -21,34 +21,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	renderer.Initialize();
 
 	// 初期化
-	Vector3 translates[3] = {
-		{0.2f, 1.0f, 0.0f},
-		{0.4f, 0.0f, 0.0f},
-		{0.3f, 0.0f, 0.0f}
-	};
-	Vector3 rotates[3] = {
-		{0.0f, 0.0f, -6.8f},
-		{0.0f, 0.0f, -1.4f},
-		{0.0f, 0.0f,  0.0f}
-	};
-	Vector3 scales[3] = {
-		{1.0f, 1.0f, 1.0f},
-		{1.0f, 1.0f, 1.0f},
-		{1.0f, 1.0f, 1.0f}
-	};
-
-	Sphere shoulderSphere = {
-		.radius = 0.05f,
-		.color = RED
-	};
-	Sphere elbowSphere = {
-		.radius = 0.05f,
-		.color = GREEN
-	};
-	Sphere handSphere = {
-		.radius = 0.05f,
-		.color = BLUE
-	};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -63,7 +35,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		renderer.Update(scales, rotates, translates);
+		Vector3 a{ 0.2f, 1.0f, 0.0f };
+		Vector3 b{ 2.4f, 3.1f, 1.2f };
+		Vector3 c = a + b;
+		Vector3 d = a - b;
+		Vector3 e = a * 2.4f;
+		Vector3 rotate{ 0.4f, 1.43f, -0.8f };
+		Matrix4x4 rotateXMatrix = Matrix4x4::MakeRotateXMatrix(rotate.x);
+		Matrix4x4 rotateYMatrix = Matrix4x4::MakeRotateYMatrix(rotate.y);
+		Matrix4x4 rotateZMatrix = Matrix4x4::MakeRotateZMatrix(rotate.z);
+		Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
 
 		///
 		/// ↑更新処理ここまで
@@ -73,30 +54,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		renderer.Draw();
-
-		Vector3 screenShoulder = Vector3::Transform(shoulderSphere.center, renderer.shoulderWorldViewProjectionMatrix * renderer.viewportMatrix);
-		Vector3 screenElbow = Vector3::Transform(elbowSphere.center, renderer.elbowWorldViewProjectionMatrix * renderer.viewportMatrix);
-		Vector3 screenHand = Vector3::Transform(handSphere.center, renderer.handWorldViewProjectionMatrix * renderer.viewportMatrix);
-
-		// 描画する
-		Novice::DrawLine(static_cast<int>(screenShoulder.x), static_cast<int>(screenShoulder.y), static_cast<int>(screenElbow.x), static_cast<int>(screenElbow.y), WHITE);
-		Novice::DrawLine(static_cast<int>(screenElbow.x), static_cast<int>(screenElbow.y), static_cast<int>(screenHand.x), static_cast<int>(screenHand.y), WHITE);
-
-		Sphere::Draw(renderer.shoulderWorldViewProjectionMatrix, renderer.viewportMatrix, shoulderSphere);
-		Sphere::Draw(renderer.elbowWorldViewProjectionMatrix, renderer.viewportMatrix, elbowSphere);
-		Sphere::Draw(renderer.handWorldViewProjectionMatrix, renderer.viewportMatrix, handSphere);
-
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("translates[0]", &translates[0].x, 0.01f);
-		ImGui::DragFloat3("rotates[0]", &rotates[0].x, 0.01f);
-		ImGui::DragFloat3("scales[0]", &scales[0].x, 0.01f);
-		ImGui::DragFloat3("translates[1]", &translates[1].x, 0.01f);
-		ImGui::DragFloat3("rotates[1]", &rotates[1].x, 0.01f);
-		ImGui::DragFloat3("scales[1]", &scales[1].x, 0.01f);
-		ImGui::DragFloat3("translates[2]", &translates[2].x, 0.01f);
-		ImGui::DragFloat3("rotates[2]", &rotates[2].x, 0.01f);
-		ImGui::DragFloat3("scales[2]", &scales[2].x, 0.01f);
+		ImGui::Text("c:%f, %f, %f", c.x, c.y, c.z);
+		ImGui::Text("d:%f, %f, %f", d.x, d.y, d.z);
+		ImGui::Text("e:%f, %f, %f", e.x, e.y, e.z);
+		ImGui::Text("matrix:\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n",
+			rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3],
+			rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3],
+			rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3],
+			rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]);
 		ImGui::End();
 
 		///
