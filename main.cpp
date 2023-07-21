@@ -8,7 +8,7 @@
 #include "Sphere.h"
 #include "Line.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_00_2";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_01";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -25,19 +25,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// 初期化
 	float deltaTime = 1.0f / 60.0f;
-	Spring spring = {
-		.anchor = {0.0f, 1.0f, 0.0f},
-		.naturalLength = 0.7f,
-		.stiffness = 100.0f,
-		.dampingCoefficient = 2.0f
+	float angularVelocity = 3.14f;
+	float angle = 0.0f;
+	float radius = 0.8f;
+	Sphere sphere = {
+		.radius = 0.03f,
+		.color = WHITE
 	};
-	Ball ball = {
-		.position = {0.8f, 0.2f, 0.0f},
-		.mass = 2.0f,
-		.radius = 0.05f,
-		.color = BLUE
-	};
-	const Vector3 kGravity{ 0.0f, -9.8f, 0.0f };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -54,21 +48,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		renderer.Update();
 
-		Vector3 diff = ball.position - spring.anchor;
-		float length = Vector3::Length(diff);
-		if (length != 0.0f) {
-			Vector3 direction = Vector3::Normalize(diff);
-			Vector3 restPosition = spring.anchor + direction * spring.naturalLength;
-			Vector3 displacement = length * (ball.position - restPosition);
-			Vector3 restoringForce = -spring.stiffness * displacement;
-			Vector3 damingForce = -spring.dampingCoefficient * ball.velocity;
-			Vector3 force = restoringForce + damingForce;
-			ball.acceleration = force / ball.mass;
-		}
-
-		ball.velocity += ball.acceleration * deltaTime;
-		ball.position += ball.velocity * deltaTime;
-		ball.position += kGravity * deltaTime;
+		angle += angularVelocity * deltaTime;
+		sphere.center = { -radius * std::sin(angle), radius * std::cos(angle), 0.0f };
 
 		///
 		/// ↑更新処理ここまで
@@ -80,13 +61,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		renderer.Draw();
 
-		renderer.ScreenLine(spring.anchor, ball.position, WHITE);
-		Ball::Draw(renderer, ball);
+		Sphere::Draw(renderer, sphere);
 
 		ImGui::Begin("Window");
 		if (ImGui::Button("Start")) {
-			ball.position = { 1.2f, 0.0f, 0.0f };
-			ball.acceleration = { 0.0f, 0.0f, 0.0f };
+
 		}
 		ImGui::End();
 
