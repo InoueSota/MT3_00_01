@@ -3,12 +3,11 @@
 #include "Renderer.h"
 #include "Matrix4x4.h"
 #include "Vector3.h"
-#include "Spring.h"
-#include "Ball.h"
+#include "Pendulum.h"
 #include "Sphere.h"
 #include "Line.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_01";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_02";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -25,11 +24,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// 初期化
 	float deltaTime = 1.0f / 60.0f;
-	float angularVelocity = 3.14f;
-	float angle = 0.0f;
-	float radius = 0.8f;
+	Pendulum pendulum = {
+		.anchor = {0.0f, 1.0f, 0.0f},
+		.length = 0.8f,
+		.angle = 0.7f,
+		.angularVelocity = 0.0f,
+		.angularAcceleration = 0.0f
+	};
 	Sphere sphere = {
-		.radius = 0.03f,
+		.center = {0.0f, 0.0f, 0.0f},
+		.radius = 0.05f,
+		.color = WHITE
+	};
+	Segment segment = {
 		.color = WHITE
 	};
 
@@ -48,8 +55,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		renderer.Update();
 
-		angle += angularVelocity * deltaTime;
-		sphere.center = { -radius * std::sin(angle), radius * std::cos(angle), 0.0f };
+		pendulum.angularAcceleration = -(9.8f / pendulum.length) * std::sin(pendulum.angle);
+		pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
+		pendulum.angle += pendulum.angularVelocity * deltaTime;
+
+		sphere.center.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
+		sphere.center.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
+		sphere.center.z = pendulum.anchor.z;
+
+		segment.origin = pendulum.anchor;
+		segment.diff = sphere.center - segment.origin;
 
 		///
 		/// ↑更新処理ここまで
@@ -61,11 +76,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		renderer.Draw();
 
+		Segment::Draw(renderer, segment);
 		Sphere::Draw(renderer, sphere);
 
 		ImGui::Begin("Window");
 		if (ImGui::Button("Start")) {
-
+			pendulum.angularVelocity = 0.0f;
+			pendulum.angularAcceleration = 0.0f;
+			pendulum.angle = 0.7f;
 		}
 		ImGui::End();
 
