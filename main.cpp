@@ -3,11 +3,11 @@
 #include "Renderer.h"
 #include "Matrix4x4.h"
 #include "Vector3.h"
-#include "Pendulum.h"
+#include "ConicalPendulum.h"
 #include "Sphere.h"
 #include "Line.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_02";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_03";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -24,12 +24,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// 初期化
 	float deltaTime = 1.0f / 60.0f;
-	Pendulum pendulum = {
+	ConicalPendulum conicalPendulum = {
 		.anchor = {0.0f, 1.0f, 0.0f},
 		.length = 0.8f,
+		.halfApexAngle = 0.7f,
 		.angle = 0.7f,
 		.angularVelocity = 0.0f,
-		.angularAcceleration = 0.0f
 	};
 	Sphere sphere = {
 		.center = {0.0f, 0.0f, 0.0f},
@@ -55,15 +55,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		renderer.Update();
 
-		pendulum.angularAcceleration = -(9.8f / pendulum.length) * std::sin(pendulum.angle);
-		pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
-		pendulum.angle += pendulum.angularVelocity * deltaTime;
+		conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.length * std::cos(conicalPendulum.halfApexAngle)));
+		conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
 
-		sphere.center.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
-		sphere.center.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
-		sphere.center.z = pendulum.anchor.z;
+		float radius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+		float height = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
 
-		segment.origin = pendulum.anchor;
+		sphere.center.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
+		sphere.center.y = conicalPendulum.anchor.y - height;
+		sphere.center.z = conicalPendulum.anchor.z - std::sin(conicalPendulum.angle) * radius;
+
+		segment.origin = conicalPendulum.anchor;
 		segment.diff = sphere.center - segment.origin;
 
 		///
@@ -81,9 +83,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::Begin("Window");
 		if (ImGui::Button("Start")) {
-			pendulum.angularVelocity = 0.0f;
-			pendulum.angularAcceleration = 0.0f;
-			pendulum.angle = 0.7f;
+			conicalPendulum.angularVelocity = 0.0f;
+			conicalPendulum.angle = 0.7f;
 		}
 		ImGui::End();
 
