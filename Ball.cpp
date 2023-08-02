@@ -1,4 +1,11 @@
 #include "Ball.h"
+#include "CollisionManager.h"
+#include "Sphere.h"
+
+Vector3 Ball::Reflect(const Vector3& input, const Vector3& normal)
+{
+	return input - 2 * Vector3::Dot(input, normal) * normal;
+}
 
 void Ball::Draw(Renderer& renderer, const Ball& ball)
 {

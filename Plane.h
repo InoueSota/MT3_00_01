@@ -10,8 +10,8 @@ struct Plane
 	float distance;
 
 	/// <summary>
-	/// 球描画
+	/// 平面描画
 	/// </summary>
-	static void DrawPlane(Renderer& renderer, const Plane& plane, uint32_t color);
+	static void Draw(Renderer& renderer, const Plane& plane, uint32_t color);
 };
 

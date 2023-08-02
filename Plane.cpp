@@ -3,7 +3,7 @@
 #include <Novice.h>
 
 
-void Plane::DrawPlane(Renderer& renderer, const Plane& plane, uint32_t color) {
+void Plane::Draw(Renderer& renderer, const Plane& plane, uint32_t color) {
 	Vector3 center = Vector3::Multiply(plane.distance, plane.normal);
 	Vector3 perpendiculars[4];
 	perpendiculars[0] = Vector3::Normalize(Vector3::Perpendicular(plane.normal));

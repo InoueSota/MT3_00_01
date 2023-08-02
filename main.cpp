@@ -3,11 +3,13 @@
 #include "Renderer.h"
 #include "Matrix4x4.h"
 #include "Vector3.h"
-#include "ConicalPendulum.h"
+#include "CollisionManager.h"
 #include "Sphere.h"
 #include "Line.h"
+#include "Plane.h"
+#include "Ball.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_03";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_04";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -24,19 +26,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// 初期化
 	float deltaTime = 1.0f / 60.0f;
-	ConicalPendulum conicalPendulum = {
-		.anchor = {0.0f, 1.0f, 0.0f},
-		.length = 0.8f,
-		.halfApexAngle = 0.7f,
-		.angle = 0.7f,
-		.angularVelocity = 0.0f,
+	float e = 0.9f;
+	Plane plane = {
+		.normal = Vector3::Normalize({-0.2f, 0.9f, -0.3f}),
+		.distance = 0.0f
 	};
-	Sphere sphere = {
-		.center = {0.0f, 0.0f, 0.0f},
+	Ball ball = {
+		.position = {0.8f, 1.2f, 0.3f},
+		.mass = 2.0f,
 		.radius = 0.05f,
-		.color = WHITE
-	};
-	Segment segment = {
 		.color = WHITE
 	};
 
@@ -55,18 +53,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		renderer.Update();
 
-		conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.length * std::cos(conicalPendulum.halfApexAngle)));
-		conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
+		ball.acceleration = { 0.0f, -9.8f, 0.0f };
 
-		float radius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
-		float height = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
-
-		sphere.center.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
-		sphere.center.y = conicalPendulum.anchor.y - height;
-		sphere.center.z = conicalPendulum.anchor.z - std::sin(conicalPendulum.angle) * radius;
-
-		segment.origin = conicalPendulum.anchor;
-		segment.diff = sphere.center - segment.origin;
+		ball.velocity += ball.acceleration * deltaTime;
+		ball.position += ball.velocity * deltaTime;
+		if (IsCollision(Sphere{ ball.position, ball.radius }, plane)) {
+			ball.velocity = Ball::Reflect(ball.velocity, plane.normal) * e;
+		}
 
 		///
 		/// ↑更新処理ここまで
@@ -78,15 +71,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		renderer.Draw();
 
-		Segment::Draw(renderer, segment);
-		Sphere::Draw(renderer, sphere);
-
-		ImGui::Begin("Window");
-		if (ImGui::Button("Start")) {
-			conicalPendulum.angularVelocity = 0.0f;
-			conicalPendulum.angle = 0.7f;
-		}
-		ImGui::End();
+		Sphere::Draw(renderer, Sphere{ ball.position, ball.radius, WHITE });
+		Plane::Draw(renderer, plane, WHITE);
 
 		///
 		/// ↑描画処理ここまで
