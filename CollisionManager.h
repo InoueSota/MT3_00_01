@@ -5,6 +5,7 @@
 #include "Line.h"
 #include "AABB.h"
 #include "OBB.h"
+#include "Capsule.h"
 
 /// <summary>
 /// 球同士当たり判定
@@ -17,9 +18,9 @@ bool IsCollision(const Sphere& s1, const Sphere& s2);
 bool IsCollision(const Sphere& sphere, const Plane& plane);
 
 /// <summary>
-/// 直線と平面の当たり判定
+/// カプセルと平面の当たり判定
 /// </summary>
-bool IsCollision(const Line& line, const Plane& plane);
+bool IsCollision(const Capsule& capsule, const Plane& plane);
 
 /// <summary>
 /// 直線と三角形の当たり判定

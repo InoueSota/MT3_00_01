@@ -157,5 +157,6 @@
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Pendulum.h" />
     <ClInclude Include="ConicalPendulum.h" />
+    <ClInclude Include="Capsule.h" />
   </ItemGroup>
 </Project>

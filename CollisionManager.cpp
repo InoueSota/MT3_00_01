@@ -21,6 +21,27 @@ bool IsCollision(const Sphere& sphere, const Plane& plane)
     return false;
 }
 
+bool IsCollision(const Capsule& capsule, const Plane& plane)
+{
+	// カプセルを使ったパターンは分からなかったです
+
+	Vector3 d = plane.normal - capsule.segment.origin;
+	Vector3 ba = capsule.segment.diff;
+	Vector3 e = Vector3::Normalize(ba);
+
+	float t = Vector3::Dot(d, e) / Vector3::Length(ba);
+	t = std::clamp(t, 0.0f, 1.0f);
+
+	Vector3 f = (1.0f - t) * capsule.segment.origin * t * (capsule.segment.origin + capsule.segment.diff);
+
+	float distance = Vector3::Length(plane.normal - f);
+
+	if (distance < capsule.radius) {
+		return true;
+	}
+	return false;
+}
+
 // 直線
 bool IsCollision(const Line& line, const Plane& plane)
 {

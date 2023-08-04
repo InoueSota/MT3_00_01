@@ -9,7 +9,7 @@
 #include "Plane.h"
 #include "Ball.h"
 
-const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_04";
+const char kWindowTitle[] = "LD2A_02_イノウエソウタ_MT3_04_04_ex1";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -26,13 +26,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// 初期化
 	float deltaTime = 1.0f / 60.0f;
-	float e = 0.9f;
+	float e = 0.6f;
 	Plane plane = {
-		.normal = Vector3::Normalize({-0.2f, 0.9f, -0.3f}),
+		.normal = Vector3::Normalize({-0.2f, 1.2f, -0.3f}),
 		.distance = 0.0f
 	};
 	Ball ball = {
 		.position = {0.8f, 1.2f, 0.3f},
+		.acceleration = { 0.0f, -9.8f, 0.0f },
 		.mass = 2.0f,
 		.radius = 0.05f,
 		.color = WHITE
@@ -53,12 +54,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		renderer.Update();
 
-		ball.acceleration = { 0.0f, -9.8f, 0.0f };
+		Vector3 prePosition = ball.position;
 
 		ball.velocity += ball.acceleration * deltaTime;
 		ball.position += ball.velocity * deltaTime;
-		if (IsCollision(Sphere{ ball.position, ball.radius }, plane)) {
+		if (IsCollision(Segment{prePosition, ball.position - prePosition}, plane)) {
+			float dot = Vector3::Dot(ball.position - prePosition, plane.normal);
+			float t = (plane.distance - Vector3::Dot(prePosition, plane.normal)) / dot;
+
+			prePosition += (ball.position - prePosition) * t;
+			ball.position = prePosition;
+			ball.position += Vector3::Normalize(plane.normal) * (ball.radius * 2);
 			ball.velocity = Ball::Reflect(ball.velocity, plane.normal) * e;
+
 		}
 
 		///
@@ -73,6 +81,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		Sphere::Draw(renderer, Sphere{ ball.position, ball.radius, WHITE });
 		Plane::Draw(renderer, plane, WHITE);
+
+		ImGui::Begin("Window");
+		if (ImGui::Button("Start")) {
+			ball.position = { 0.8f, 1.2f, 0.3f };
+			ball.velocity = { 0.0f, 0.0f, 0.0f };
+		}
+		ImGui::End();
 
 		///
 		/// ↑描画処理ここまで

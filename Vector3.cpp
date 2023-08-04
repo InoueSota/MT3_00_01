@@ -54,6 +54,7 @@ Vector3 operator*(const Vector3& vec, float scalar) { return { vec.x * scalar, v
 Vector3 operator*(float scalar, const Vector3& vec) { return { vec.x * scalar, vec.y * scalar, vec.z * scalar }; }
 
 // 除算
+Vector3 operator/(const Vector3& vec1, const Vector3& vec2) { return { vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z }; }
 Vector3 operator/(const Vector3& vec, float scalar) {
 	float reciprocal = 1.0f / scalar;
 	return { vec.x * reciprocal, vec.y * reciprocal, vec.z * reciprocal };
